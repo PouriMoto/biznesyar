@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const engineDir = resolve(process.env.ENGINE_DIR || join(root, '..', 'engine'));
-const project = process.env.ENGINE_PROJECT || 'projects/bizyaar.yaml';
+const project = process.env.ENGINE_PROJECT || 'projects/biznesyar.yaml';
 const once = process.argv.includes('once');
 const py = ['python3', 'python'].find((c) => spawnSync(c, ['--version']).status === 0);
 
