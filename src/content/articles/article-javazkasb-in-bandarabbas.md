@@ -6,7 +6,7 @@ tags: []
 service: business-license
 region: bandar-abbas
 publishedAt: 2026-10-25
-draft: true
+draft: false
 leadForm: true
 magnet: license-docs
 generatedBy: agent
