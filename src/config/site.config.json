@@ -57,15 +57,15 @@
     },
     {
       "slug": "company-registration",
-      "enabled": true
+      "enabled": false
     },
     {
       "slug": "trade-card",
-      "enabled": true
+      "enabled": false
     },
     {
       "slug": "tax",
-      "enabled": true
+      "enabled": false
     }
   ],
   "features": {
