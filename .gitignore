@@ -1,48 +1,26 @@
+node_modules
+dist
+.astro
+.DS_Store
 
-# ==========================================
-# BizYaar - Git Ignore
-# ==========================================
-
-# Dependencies
-node_modules/
-
-# Astro
-.astro/
-dist/
-
-# Environment / Secrets
+# اسرار و مقدارهای شخصی (هرگز در گیت)
 .env
 .env.*
 !.env.example
+*.local.json
+!*.local.example.json
 
-# PocketBase - LOCAL DATA ONLY
-# Contains database, users, cases, uploaded files, etc.
-pb_data/
+# خروجی ساخته‌شده توسط scripts/build-kit.mjs
+public/studio/kit.json
+public/studio/preview.css
+public/studio/content.json
 
-# Local credentials / development notes
-LOCAL-DEV-NOTES.md
-*.local.md
-*.local.txt
+# بک‌اند (فاز ۱): فقط روی سرور شما؛ در مخزن عمومی نمی‌رود
+server/
+# اگر دیپلوی روی VPS دارید و می‌خواهید server/ را در گیت خصوصی نگه دارید، این خط را بردارید.
 
-# Logs
-*.log
-logs/
+# راهنماها و یادداشت‌های شخصی شما؛ نیازی به انتشار در گیت‌هاب نیست
+docs/
 
-# Temporary files
-tmp/
-temp/
-
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Editor / IDE
-.vscode/
-.idea/
-
-# Test / Coverage
-coverage/
-
-# Runtime / cache
-.cache/
+# راهنماهای شخصی (فقط برای خودتان؛ لازم نیست در گیت‌هاب باشد)
+docs/

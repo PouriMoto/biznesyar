@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "beauty-salon-women",
+    "name": "آرایشگاه زنانه",
+    "group": "خدمات شخصی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "barbershop",
+    "name": "آرایشگاه مردانه",
+    "group": "خدمات شخصی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "cafe",
+    "name": "کافه",
+    "group": "غذا و پذیرایی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "restaurant",
+    "name": "رستوران",
+    "group": "غذا و پذیرایی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "grocery",
+    "name": "فروشگاه مواد غذایی",
+    "group": "خرده‌فروشی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "clothing-store",
+    "name": "فروشگاه پوشاک",
+    "group": "خرده‌فروشی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "auto-repair",
+    "name": "تعمیرگاه خودرو",
+    "group": "خدمات فنی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "training-center",
+    "name": "آموزشگاه",
+    "group": "آموزش",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "real-estate-agency",
+    "name": "مشاور املاک",
+    "group": "خدمات",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "workshop",
+    "name": "کارگاه تولیدی",
+    "group": "تولید",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  }
+]

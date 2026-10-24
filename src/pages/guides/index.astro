@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import { getGuides, allServices, getRegions } from '../../lib/content';
+import { trades, getTrade } from '../../lib/trades';
+import { breadcrumbSchema } from '../../lib/seo';
+const guides = await getGuides();
+const services = allServices();
+const regions = getRegions();
+// گروه‌بندی بر اساس رسته، به ترتیب فهرست رسته‌ها
+const groups = trades.map((t) => ({ t, items: guides.filter((g) => g.data.trade === t.slug) })).filter((g) => g.items.length);
+const others = guides.filter((g) => !getTrade(g.data.trade));
+---
+<BaseLayout title="راهنمای مجوز هر رسته" description="راهنمای مدارک و مراحل دریافت مجوز برای هر رسته شغلی، به تفکیک شهر و منطقه." jsonLd={[breadcrumbSchema([{ name: 'خانه', path: '/' }, { name: 'راهنماها', path: '/guides/' }])]}>
+  <div class="page-head">
+    <div class="container">
+      <Breadcrumbs items={[{ name: 'راهنماها' }]} />
+      <h1>راهنمای مجوز هر رسته</h1>
+      <p>مدارک، مراحل و نکته‌های هر رسته شغلی؛ اگر شهر شما تفاوتی دارد، راهنمای همان شهر را بخوانید.</p>
+    </div>
+  </div>
+  <div class="container aside-layout">
+    <div>
+      {guides.length === 0 ? <p>به‌زودی راهنماهای تازه منتشر می‌شود.</p> : groups.map(({ t, items }) => (
+        <section style="margin-bottom:2rem">
+          <h2>{t.name}</h2>
+          <div class="art-list">
+            {items.map((g) => (
+              <a class="art-item" href={`/guides/${g.id}/`}>
+                <div class="meta">
+                  <span class="badge">{services.find((s) => s.slug === g.data.service)?.title ?? g.data.service}</span>
+                  {g.data.region && <span class="badge">{regions.find((r) => r.slug === g.data.region)?.name ?? g.data.region}</span>}
+                  {g.data.draft && <span class="badge draft">پیش‌نویس</span>}
+                </div>
+                <h3>{g.data.title}</h3><p>{g.data.description}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+      {others.length > 0 && <div class="art-list">{others.map((g) => <a class="art-item" href={`/guides/${g.id}/`}><h3>{g.data.title}</h3><p>{g.data.description}</p></a>)}</div>}
+    </div>
+    <aside class="sticky"><LeadForm compact heading="رستهٔ شما چیست؟" sub="شماره‌تان را بگذارید تا مدارک رستهٔ شما را بگوییم." formName="guides_index" /></aside>
+  </div>
+</BaseLayout>

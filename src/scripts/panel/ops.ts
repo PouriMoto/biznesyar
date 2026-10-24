@@ -53,12 +53,18 @@ async function leadsView() {
   await refreshSummary(); renderTabs('leads');
   const showArch = sessionStorage.getItem('bz_arch') === '1';
   const leads = await list('leads', `sort=-created&filter=archived=${showArch}`);
-  app.innerHTML = `<div class="filters"><label><input type="checkbox" id="arch" ${showArch ? 'checked' : ''} /> نمایش بایگانی</label> <small class="meta">لیدهای بی‌اقدام بعد از ۳۰ روز خودکار «از دست رفته» و بایگانی می‌شوند؛ لیدِ پرونده‌های تکمیل‌شده هم بایگانی می‌شود.</small></div>
+  app.innerHTML = `<div class="filters"><label><input type="checkbox" id="arch" ${showArch ? 'checked' : ''} /> نمایش بایگانی</label> <button class="btn btn-ghost" id="lead-csv" type="button">دانلود CSV (اکسل)</button> <small class="meta">لیدهای بی‌اقدام بعد از ۳۰ روز خودکار «از دست رفته» و بایگانی می‌شوند؛ لیدِ پرونده‌های تکمیل‌شده هم بایگانی می‌شود.</small></div>
     <div class="table-wrap"><table class="tbl"><thead><tr><th>تاریخ</th><th>نام</th><th>موبایل</th><th>خدمت / منطقه</th><th>پیام</th><th>وضعیت</th><th></th></tr></thead><tbody>
     ${leads.map((l: any) => `<tr><td>${when(l.created)}</td><td>${esc(l.name)}</td><td><a dir="ltr" href="tel:${esc(l.phone)}">${esc(l.phone)}</a></td><td>${esc(l.service)} / ${esc(l.region)}<br><small>${esc(l.source)}</small></td><td>${esc(l.message)}</td>
       <td><select data-lead="${l.id}" class="lead-st">${opts(L.lead, l.status)}</select></td>
       <td>${l.case_tracking ? `<bdi>${esc(l.case_tracking)}</bdi>` : `<button class="btn btn-ghost mk-case" data-lead='${esc(JSON.stringify({ id: l.id, name: l.name, phone: l.phone, service: l.service, region: l.region }))}'>ساخت پرونده</button>`}
       <button class="btn btn-ghost lead-arch" data-id="${l.id}" data-a="${l.archived ? 0 : 1}">${l.archived ? 'بازگردانی' : 'بایگانی'}</button></td></tr>`).join('') || '<tr><td colspan="7">لیدی نیست.</td></tr>'}</tbody></table></div>`;
+  document.getElementById('lead-csv')!.addEventListener('click', () => {
+    const cell = (v: unknown) => { let t = String(v ?? '').replace(/\r?\n/g, ' '); if (/^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };
+    const rows = [['تاریخ', 'نام', 'موبایل', 'خدمت', 'منطقه', 'پیام', 'منبع', 'وضعیت'], ...leads.map((l: any) => [l.created, l.name, l.phone, l.service, l.region, l.message, l.source, l.status])];
+    const url = URL.createObjectURL(new Blob(['\ufeff' + rows.map((r) => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
+  });
   document.getElementById('arch')!.addEventListener('change', (e) => { sessionStorage.setItem('bz_arch', (e.target as HTMLInputElement).checked ? '1' : '0'); leadsView(); });
   app.querySelectorAll<HTMLSelectElement>('.lead-st').forEach((s) => s.addEventListener('change', async () => { try { await api(`/api/collections/leads/records/${s.dataset.lead}`, { method: 'PATCH', json: { status: s.value, archived: s.value === 'lost' } }); toast('ذخیره شد'); } catch (e) { fail(e); } }));
   app.querySelectorAll<HTMLButtonElement>('.lead-arch').forEach((b) => b.addEventListener('click', async () => { try { await api(`/api/collections/leads/records/${b.dataset.id}`, { method: 'PATCH', json: { archived: b.dataset.a === '1' } }); leadsView(); } catch (e) { fail(e); } }));

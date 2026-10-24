@@ -1,6 +1,6 @@
 import { site } from '../config';
 import { channels, sameAs, phones } from './links';
-import regions from '../data/regions.json';
+import { regions } from './regions';
 
 export const abs = (p: string) => new URL(p, import.meta.env.SITE).href;
 const ctx = 'https://schema.org';

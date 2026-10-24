@@ -1,0 +1,4 @@
+{
+  "_توضیح": "کپی کنید به kit.local.json (در گیت نیست). بلوک briefForm را از Studio ← Agent ← اتصال بردارید. Engine لینک csv را از همین‌جا می‌خواند.",
+  "studio": { "briefForm": { "action": "", "key": "", "fields": { "key": "", "type": "", "title": "", "job": "" }, "csv": "" } }
+}

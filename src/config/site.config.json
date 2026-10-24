@@ -20,25 +20,25 @@
     "og_image": "/brand/og.png"
   },
   "contact": {
-    "phone": "09928710944",
-    "whatsapp": "989928710944",
-    "bale": "@cafinetyar_admin",
+    "phone": "",
+    "whatsapp": "",
+    "bale": "",
     "rubika": "",
     "instagram": "",
-    "address": "بندرعباس، آزادشهر، خیابان سپاه، پشت پمپ بنزین پامرو، روبروی زمین ورزشی شهسوار، جنب املاک هواسی، بیزنس‌یار(کافینت یار) (پرچم آبی)",
-    "hours": "9 صبح تا 21",
+    "address": "بندرعباس، آزادشهر، خیابان سپاه، پشت پمپ بنزین پامرو، روبروی زمین ورزشی شهسوار، جنب املاک هواسی، بیزنس‌یار (پرچم آبی)",
+    "hours": "۹ تا ۲۱",
     "phones": [
       {
         "number": "07691095331",
         "label": "تلفن دفتر"
       },
       {
-        "number": "09928710944",
+        "number": "09999631531",
         "label": "موبایل"
       }
     ],
-    "addressShort": "آزادشهر بندرعباس، خیابان سپاه، روبروی زمین ورزشی شهسوار",
-    "mapUrl": "https://www.google.com/maps/search/?api=1&query=27.209055,56.315500"
+    "addressShort": "آزادشهر بندرعباس، خیابان سپاه",
+    "mapUrl": ""
   },
   "cta": {
     "order": [
@@ -57,15 +57,15 @@
     },
     {
       "slug": "company-registration",
-      "enabled": false
+      "enabled": true
     },
     {
       "slug": "trade-card",
-      "enabled": false
+      "enabled": true
     },
     {
       "slug": "tax",
-      "enabled": false
+      "enabled": true
     }
   ],
   "features": {
@@ -111,16 +111,16 @@
     "enabled": true,
     "provider": "google-form",
     "googleForm": {
-      "action": "https://docs.google.com/forms/d/e/1FAIpQLSd6eS0hdHYVcyLJWc-gCSe8YmELOE21lf3IV3PpDfqQXu4RrQ/formResponse",
+      "action": "https://docs.google.com/forms/d/e/FORM_ID_HERE/formResponse",
       "fields": {
-        "name": "entry.1562652169",
-        "phone": "entry.598317064",
-        "service": "entry.109824401",
-        "region": "entry.771852707",
-        "message": "entry.474556482",
-        "page": "entry.1405938118",
-        "source": "entry.94078270",
-        "utm": "entry.1351009456"
+        "name": "entry.0000000001",
+        "phone": "entry.0000000002",
+        "service": "entry.0000000003",
+        "region": "entry.0000000004",
+        "message": "entry.0000000005",
+        "page": "entry.0000000006",
+        "source": "entry.0000000007",
+        "utm": "entry.0000000008"
       }
     },
     "placements": {

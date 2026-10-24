@@ -39,14 +39,14 @@ const latest = (await getArticles()).slice(0, 3);
           </div>
         )}
       </div>
-      <LeadForm id="lead" heading="مشاوره رایگان" sub="شماره‌تان را بگذارید تا با شما تماس بگیریم." formName="hero" placement="hero" />
+      <LeadForm id="lead" heading={home.sections.leadForm.heading} sub={home.sections.leadForm.sub} formName="hero" placement="hero" />
     </div>
   </section>
 
   <section class="section" id="services">
     <div class="container">
-      <h2>خدمات</h2>
-      <p class="lead-text">از جواز کسب شروع می‌کنیم و خدمات بعدی را به‌تدریج اضافه می‌کنیم.</p>
+      <h2>{home.sections.services.title}</h2>
+      <p class="lead-text">{home.sections.services.lead}</p>
       <div class="rows">
         {services.map((s) => s.enabled ? (
           <a class="row-item" href={`/services/${s.slug}/`}>
@@ -90,8 +90,8 @@ const latest = (await getArticles()).slice(0, 3);
 
   <section class="section section-tint" id="areas">
     <div class="container">
-      <h2>مناطق تحت پوشش</h2>
-      <p class="lead-text">بندرعباس، مناطق آزاد قشم و کیش و شهرهای دیگر هرمزگان.</p>
+      <h2>{home.sections.areas.title}</h2>
+      <p class="lead-text">{home.sections.areas.lead}</p>
       <div class="areas">
         {regions.map((r) => <a class="area" href={`/areas/${r.slug}/`}>{r.name}<small>{r.kind}</small></a>)}
       </div>
@@ -101,7 +101,7 @@ const latest = (await getArticles()).slice(0, 3);
   {latest.length > 0 && (
     <section class="section">
       <div class="container">
-        <h2>تازه‌ترین مقالات</h2>
+        <h2>{home.sections.articles.title}</h2>
         <div class="art-list">
           {latest.map((a) => (
             <a class="art-item" href={`/articles/${a.id}/`}>
@@ -118,7 +118,7 @@ const latest = (await getArticles()).slice(0, 3);
   <section class="section">
     <div class="container split">
       <div class="office">
-        <h2>دفتر مرکزی</h2>
+        <h2>{home.sections.office.title}</h2>
         <address style="font-style:normal">{office.address}</address>
         <div class="phones">{ph.map((p) => <a href={p.href} data-track="cta_click" data-label={`office_${p.number}`}>{p.display}</a>)}</div>
         {office.hours && <span>ساعات کاری: {office.hours}</span>}
@@ -135,7 +135,7 @@ const latest = (await getArticles()).slice(0, 3);
     <div class="container center">
       <h2>{home.cta.title}</h2>
       <p class="lead-text" style="margin-inline:auto">{home.cta.text}</p>
-      <a class="btn btn-ghost" href="#lead" data-track="cta_click" data-label="band">ثبت درخواست مشاوره رایگان</a>
+      <a class="btn btn-ghost" href="#lead" data-track="cta_click" data-label="band">{home.cta.button}</a>
     </div>
   </section>
 </BaseLayout>

@@ -1,0 +1,1001 @@
+{
+  "version": 1,
+  "types": {
+    "article": {
+      "label": "مقاله",
+      "output": "src/content/articles/{slug}.md",
+      "assetsDir": "src/assets/articles/{slug}/",
+      "coverFile": "cover.webp",
+      "coverRef": "../../assets/articles/{slug}/cover.webp",
+      "preview": "article",
+      "agentDefaults": {
+        "draft": true,
+        "generatedBy": "agent"
+      },
+      "inputs": [
+        {
+          "key": "topic",
+          "label": "موضوع یا عنوان مقاله",
+          "kind": "text",
+          "required": true,
+          "example": "مدارک لازم برای جواز کسب آرایشگاه در بندرعباس",
+          "help": "یک جمله؛ مثل چیزی که مردم در گوگل می‌نویسند."
+        },
+        {
+          "key": "style",
+          "label": "سبک مقاله",
+          "kind": "select",
+          "list": "styles",
+          "required": true
+        },
+        {
+          "key": "service",
+          "label": "خدمت مرتبط",
+          "kind": "select",
+          "list": "services",
+          "required": true
+        },
+        {
+          "key": "region",
+          "label": "شهر یا منطقه",
+          "kind": "select",
+          "list": "regions",
+          "group": "extra"
+        },
+        {
+          "key": "keywords",
+          "label": "کلمات کلیدی",
+          "kind": "tags",
+          "group": "extra",
+          "example": "جواز کسب آرایشگاه، مدارک آرایشگاه",
+          "help": "اولی کلمه اصلی است."
+        },
+        {
+          "key": "questions",
+          "label": "سؤالات متداول که حتماً پاسخ داده شود",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر سؤال در یک خط."
+        },
+        {
+          "key": "mustInclude",
+          "label": "نکاتی که حتماً بیاید",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر نکته در یک خط."
+        },
+        {
+          "key": "sources",
+          "label": "منابع و لینک‌ها",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر خط: «عنوان | لینک». لینک اختیاری است."
+        },
+        {
+          "key": "rawText",
+          "label": "متن یا یادداشت خودتان",
+          "kind": "longtext",
+          "group": "extra",
+          "help": "هر متن خامی که دارید؛ از آن به‌عنوان مرجع استفاده می‌شود."
+        },
+        {
+          "key": "length",
+          "label": "طول",
+          "kind": "select",
+          "options": [
+            [
+              "short",
+              "کوتاه"
+            ],
+            [
+              "medium",
+              "متوسط"
+            ],
+            [
+              "long",
+              "بلند"
+            ]
+          ],
+          "default": "medium",
+          "group": "extra"
+        },
+        {
+          "key": "coverUrl",
+          "label": "لینک تصویر شاخص",
+          "kind": "url",
+          "group": "extra",
+          "help": "اختیاری؛ Engine دانلودش می‌کند. در Studio می‌توانید فایل هم انتخاب کنید."
+        },
+        {
+          "key": "coverAlt",
+          "label": "توضیح تصویر (alt)",
+          "kind": "text",
+          "group": "extra",
+          "help": "توضیح واقعی از آنچه در تصویر است."
+        }
+      ],
+      "fields": [
+        {
+          "key": "title",
+          "label": "عنوان",
+          "kind": "text",
+          "required": true,
+          "max": 70,
+          "ai": "عنوان جذاب و جست‌وجوپذیر، ترجیحاً ۶۰ کاراکتر یا کمتر، شامل کلمه اصلی."
+        },
+        {
+          "key": "description",
+          "label": "توضیح متا",
+          "kind": "text",
+          "required": true,
+          "min": 70,
+          "max": 200,
+          "ai": "یک یا دو جمله، ۱۱۰ تا ۱۶۰ کاراکتر، شامل کلمه اصلی و فایده مقاله."
+        },
+        {
+          "key": "category",
+          "label": "دسته",
+          "kind": "text",
+          "required": true,
+          "suggest": "categories",
+          "ai": "یک دسته کوتاه؛ ترجیحاً از دسته‌های موجود."
+        },
+        {
+          "key": "tags",
+          "label": "برچسب‌ها",
+          "kind": "tags",
+          "default": [],
+          "ai": "۲ تا ۵ برچسب کوتاه."
+        },
+        {
+          "key": "service",
+          "label": "خدمت",
+          "kind": "select",
+          "list": "services"
+        },
+        {
+          "key": "region",
+          "label": "منطقه",
+          "kind": "select",
+          "list": "regions"
+        },
+        {
+          "key": "publishedAt",
+          "label": "تاریخ انتشار",
+          "kind": "date",
+          "required": true,
+          "default": "today"
+        },
+        {
+          "key": "draft",
+          "label": "پیش‌نویس",
+          "kind": "bool",
+          "default": true,
+          "help": "تا بازبینی نشده روشن بماند."
+        },
+        {
+          "key": "leadForm",
+          "label": "فرم لید پایین مقاله",
+          "kind": "bool",
+          "default": true
+        },
+        {
+          "key": "magnet",
+          "label": "لید مگنت (فایل PDF)",
+          "kind": "select",
+          "list": "magnets",
+          "default": "auto",
+          "help": "«خودکار» = فایلِ مرتبط با خدمت و برچسب‌های مقاله. یا یک فایل مشخص را انتخاب کنید."
+        },
+        {
+          "key": "generatedBy",
+          "label": "تولیدشده توسط",
+          "kind": "select",
+          "options": [
+            [
+              "human",
+              "انسان"
+            ],
+            [
+              "agent",
+              "هوش مصنوعی"
+            ]
+          ],
+          "default": "human"
+        },
+        {
+          "key": "cover",
+          "label": "تصویر شاخص",
+          "kind": "cover"
+        },
+        {
+          "key": "faq",
+          "label": "پرسش‌های متداول",
+          "kind": "faq",
+          "group": "extra",
+          "help": "هر پرسش و پاسخ کوتاه. برای نتیجه‌های گوگل و پاسخ‌گوهای هوشمند مفید است."
+        },
+        {
+          "key": "sources",
+          "label": "منابع",
+          "kind": "sources",
+          "help": "هر منبع: عنوان و لینک اختیاری."
+        }
+      ],
+      "rules": [
+        {
+          "id": "required",
+          "level": "error"
+        },
+        {
+          "id": "lengths",
+          "level": "error"
+        },
+        {
+          "id": "slug-valid",
+          "level": "error"
+        },
+        {
+          "id": "magnet-valid",
+          "level": "error"
+        },
+        {
+          "id": "slug-unique",
+          "level": "error"
+        },
+        {
+          "id": "cover-alt",
+          "level": "error"
+        },
+        {
+          "id": "no-h1",
+          "level": "error"
+        },
+        {
+          "id": "no-markers",
+          "level": "error"
+        },
+        {
+          "id": "banned-claims",
+          "level": "error"
+        },
+        {
+          "id": "internal-links",
+          "level": "error"
+        },
+        {
+          "id": "no-html",
+          "level": "error"
+        },
+        {
+          "id": "direct-answer",
+          "level": "warning",
+          "params": {
+            "maxWords": 60
+          }
+        },
+        {
+          "id": "title-length",
+          "level": "warning",
+          "params": {
+            "max": 60
+          }
+        },
+        {
+          "id": "faq-min",
+          "level": "warning",
+          "params": {
+            "min": 3
+          }
+        },
+        {
+          "id": "sources-min",
+          "level": "warning",
+          "params": {
+            "min": 1
+          }
+        },
+        {
+          "id": "headings-min",
+          "level": "warning",
+          "params": {
+            "min": 3
+          }
+        },
+        {
+          "id": "similar-title",
+          "level": "warning",
+          "params": {
+            "threshold": 0.7
+          }
+        },
+        {
+          "id": "word-count",
+          "level": "warning",
+          "params": {
+            "min": 450
+          }
+        },
+        {
+          "id": "callout-syntax",
+          "level": "error"
+        },
+        {
+          "id": "callout-use",
+          "level": "warning",
+          "params": {}
+        },
+        {
+          "id": "internal-links-count",
+          "level": "warning",
+          "params": {
+            "min": 2,
+            "max": 6
+          }
+        },
+        {
+          "id": "link-draft",
+          "level": "warning"
+        },
+        {
+          "id": "generic-anchor",
+          "level": "warning"
+        },
+        {
+          "id": "primary-keyword",
+          "level": "warning"
+        },
+        {
+          "id": "keyword-density",
+          "level": "warning",
+          "params": {
+            "max": 0.03
+          }
+        }
+      ]
+    },
+    "area-page": {
+      "label": "صفحه منطقه (متن بلند)",
+      "output": "src/content/areas/{slug}.md",
+      "assetsDir": "src/assets/areas/",
+      "coverFile": "{slug}.webp",
+      "coverRef": "../../assets/areas/{slug}.webp",
+      "preview": "area",
+      "inputs": [
+        {
+          "key": "region",
+          "label": "منطقه",
+          "kind": "select",
+          "list": "regions",
+          "required": true
+        },
+        {
+          "key": "style",
+          "label": "سبک",
+          "kind": "select",
+          "list": "styles",
+          "default": "local",
+          "required": true
+        },
+        {
+          "key": "topic",
+          "label": "محور صفحه",
+          "kind": "text",
+          "example": "جواز کسب در میناب",
+          "group": "extra"
+        },
+        {
+          "key": "localFacts",
+          "label": "حقایق محلی",
+          "kind": "lines",
+          "required": true,
+          "help": "اداره‌ها، آدرس‌ها، نکته‌های مخصوص این شهر؛ هر مورد در یک خط. بدون آن صفحه‌ای متمایز ساخته نمی‌شود."
+        },
+        {
+          "key": "keywords",
+          "label": "کلمات کلیدی",
+          "kind": "tags",
+          "group": "extra"
+        },
+        {
+          "key": "questions",
+          "label": "سؤالات متداول محلی",
+          "kind": "lines",
+          "group": "extra"
+        },
+        {
+          "key": "rawText",
+          "label": "متن یا یادداشت خودتان",
+          "kind": "longtext",
+          "group": "extra"
+        },
+        {
+          "key": "coverUrl",
+          "label": "لینک تصویر",
+          "kind": "url",
+          "group": "extra"
+        },
+        {
+          "key": "coverAlt",
+          "label": "توضیح تصویر (alt)",
+          "kind": "text",
+          "group": "extra"
+        }
+      ],
+      "fields": [
+        {
+          "key": "title",
+          "label": "عنوان",
+          "kind": "text",
+          "max": 70
+        },
+        {
+          "key": "description",
+          "label": "توضیح متا",
+          "kind": "text",
+          "max": 200
+        },
+        {
+          "key": "cover",
+          "label": "تصویر",
+          "kind": "cover"
+        },
+        {
+          "key": "faq",
+          "label": "پرسش‌های متداول",
+          "kind": "faq",
+          "group": "extra",
+          "help": "هر پرسش و پاسخ کوتاه. برای نتیجه‌های گوگل و پاسخ‌گوهای هوشمند مفید است."
+        },
+        {
+          "key": "updatedAt",
+          "label": "تاریخ به‌روزرسانی",
+          "kind": "date",
+          "default": "today"
+        }
+      ],
+      "rules": [
+        {
+          "id": "lengths",
+          "level": "error"
+        },
+        {
+          "id": "cover-alt",
+          "level": "error"
+        },
+        {
+          "id": "no-markers",
+          "level": "error"
+        },
+        {
+          "id": "banned-claims",
+          "level": "error"
+        },
+        {
+          "id": "internal-links",
+          "level": "error"
+        },
+        {
+          "id": "no-h1",
+          "level": "error"
+        },
+        {
+          "id": "area-unique",
+          "level": "warning",
+          "params": {
+            "threshold": 0.6
+          }
+        },
+        {
+          "id": "word-count",
+          "level": "warning",
+          "params": {
+            "min": 250
+          }
+        },
+        {
+          "id": "callout-syntax",
+          "level": "error"
+        },
+        {
+          "id": "callout-use",
+          "level": "warning",
+          "params": {}
+        },
+        {
+          "id": "internal-links-count",
+          "level": "warning",
+          "params": {
+            "min": 2,
+            "max": 6
+          }
+        },
+        {
+          "id": "link-draft",
+          "level": "warning"
+        },
+        {
+          "id": "generic-anchor",
+          "level": "warning"
+        },
+        {
+          "id": "primary-keyword",
+          "level": "warning"
+        },
+        {
+          "id": "keyword-density",
+          "level": "warning",
+          "params": {
+            "max": 0.03
+          }
+        }
+      ]
+    },
+    "region-entry": {
+      "label": "شهر یا منطقه",
+      "output": "src/data/regions/{slug}.json",
+      "format": "json",
+      "preview": "region",
+      "inputs": [],
+      "fields": [
+        {
+          "key": "slug",
+          "label": "شناسه (انگلیسی)",
+          "kind": "text",
+          "required": true,
+          "help": "حروف کوچک و خط تیره؛ مثل minab. بعداً قابل تغییر نیست."
+        },
+        {
+          "key": "name",
+          "label": "نام",
+          "kind": "text",
+          "required": true,
+          "max": 40
+        },
+        {
+          "key": "kind",
+          "label": "نوع",
+          "kind": "select",
+          "required": true,
+          "options": [
+            [
+              "مرکز استان",
+              "مرکز استان"
+            ],
+            [
+              "شهرستان",
+              "شهرستان"
+            ],
+            [
+              "منطقه آزاد",
+              "منطقه آزاد"
+            ],
+            [
+              "بخش",
+              "بخش"
+            ],
+            [
+              "استان",
+              "استان"
+            ]
+          ]
+        },
+        {
+          "key": "intro",
+          "label": "معرفی کوتاه",
+          "kind": "longtext",
+          "required": true,
+          "min": 40,
+          "max": 400,
+          "help": "۲ تا ۳ جمله که بالای صفحه شهر نمایش داده می‌شود."
+        },
+        {
+          "key": "featured",
+          "label": "در فهرست اصلی بیاید",
+          "kind": "bool",
+          "default": false
+        },
+        {
+          "key": "order",
+          "label": "ترتیب نمایش",
+          "kind": "number",
+          "default": 500,
+          "help": "عدد کوچک‌تر بالاتر. شهرهای فعلی ۱۰ تا ۱۵۰ هستند."
+        },
+        {
+          "key": "notes",
+          "label": "نکات محلی",
+          "kind": "lines",
+          "default": [],
+          "help": "هر نکته در یک خط؛ به‌صورت تیک‌لیست در صفحه شهر نمایش داده می‌شود."
+        },
+        {
+          "key": "faq",
+          "label": "پرسش‌های متداول",
+          "kind": "faq",
+          "group": "extra",
+          "help": "هر پرسش و پاسخ کوتاه. برای نتیجه‌های گوگل و پاسخ‌گوهای هوشمند مفید است."
+        }
+      ],
+      "rules": [
+        {
+          "id": "required",
+          "level": "error"
+        },
+        {
+          "id": "lengths",
+          "level": "error"
+        },
+        {
+          "id": "slug-valid",
+          "level": "error"
+        },
+        {
+          "id": "region-unique",
+          "level": "error"
+        }
+      ]
+    },
+    "guide": {
+      "label": "راهنمای رسته × مجوز (× شهر)",
+      "output": "src/content/guides/{slug}.md",
+      "assetsDir": "src/assets/guides/{slug}/",
+      "coverFile": "cover.webp",
+      "coverRef": "../../assets/guides/{slug}/cover.webp",
+      "preview": "article",
+      "agentDefaults": {
+        "draft": true,
+        "generatedBy": "agent"
+      },
+      "inputs": [
+        {
+          "key": "trade",
+          "label": "رسته (نوع کسب‌وکار)",
+          "kind": "select",
+          "list": "trades",
+          "required": true,
+          "help": "اگر رستهٔ شما در فهرست نیست، آن را در src/data/trades.json اضافه کنید."
+        },
+        {
+          "key": "service",
+          "label": "مجوز یا خدمت",
+          "kind": "select",
+          "list": "services",
+          "required": true
+        },
+        {
+          "key": "region",
+          "label": "شهر یا منطقه (اختیاری)",
+          "kind": "select",
+          "list": "regions",
+          "help": "خالی = راهنمای کشوری."
+        },
+        {
+          "key": "style",
+          "label": "سبک",
+          "kind": "select",
+          "list": "styles",
+          "required": true,
+          "default": "license-guide"
+        },
+        {
+          "key": "topic",
+          "label": "عنوان دلخواه (اختیاری)",
+          "kind": "text",
+          "group": "extra",
+          "help": "خالی بگذارید تا خودکار از رسته و مجوز ساخته شود."
+        },
+        {
+          "key": "localFacts",
+          "label": "حقایق محلی (فقط اگر شهر انتخاب کرده‌اید)",
+          "kind": "lines",
+          "group": "extra",
+          "help": "آدرس اداره‌ها و نکته‌های مخصوص همان شهر؛ هر مورد در یک خط."
+        },
+        {
+          "key": "keywords",
+          "label": "کلمات کلیدی",
+          "kind": "tags",
+          "group": "extra",
+          "example": "جواز کسب آرایشگاه، مدارک آرایشگاه",
+          "help": "اولی کلمه اصلی است."
+        },
+        {
+          "key": "questions",
+          "label": "سؤالات متداول که حتماً پاسخ داده شود",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر سؤال در یک خط."
+        },
+        {
+          "key": "mustInclude",
+          "label": "نکاتی که حتماً بیاید",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر نکته در یک خط."
+        },
+        {
+          "key": "sources",
+          "label": "منابع و لینک‌ها",
+          "kind": "lines",
+          "group": "extra",
+          "help": "هر خط: «عنوان | لینک». لینک اختیاری است."
+        },
+        {
+          "key": "rawText",
+          "label": "متن یا یادداشت خودتان",
+          "kind": "longtext",
+          "group": "extra",
+          "help": "هر متن خامی که دارید؛ از آن به‌عنوان مرجع استفاده می‌شود."
+        },
+        {
+          "key": "length",
+          "label": "طول",
+          "kind": "select",
+          "options": [
+            [
+              "short",
+              "کوتاه"
+            ],
+            [
+              "medium",
+              "متوسط"
+            ],
+            [
+              "long",
+              "بلند"
+            ]
+          ],
+          "default": "medium",
+          "group": "extra"
+        },
+        {
+          "key": "coverUrl",
+          "label": "لینک تصویر شاخص",
+          "kind": "url",
+          "group": "extra",
+          "help": "اختیاری؛ Engine دانلودش می‌کند. در Studio می‌توانید فایل هم انتخاب کنید."
+        },
+        {
+          "key": "coverAlt",
+          "label": "توضیح تصویر (alt)",
+          "kind": "text",
+          "group": "extra",
+          "help": "توضیح واقعی از آنچه در تصویر است."
+        }
+      ],
+      "fields": [
+        {
+          "key": "title",
+          "label": "عنوان",
+          "kind": "text",
+          "required": true,
+          "max": 70,
+          "ai": "عنوان جذاب و جست‌وجوپذیر، ترجیحاً ۶۰ کاراکتر یا کمتر، شامل کلمه اصلی."
+        },
+        {
+          "key": "description",
+          "label": "توضیح متا",
+          "kind": "text",
+          "required": true,
+          "min": 70,
+          "max": 200,
+          "ai": "یک یا دو جمله، ۱۱۰ تا ۱۶۰ کاراکتر، شامل کلمه اصلی و فایده مقاله."
+        },
+        {
+          "key": "trade",
+          "label": "رسته",
+          "kind": "select",
+          "list": "trades",
+          "required": true
+        },
+        {
+          "key": "service",
+          "label": "مجوز / خدمت",
+          "kind": "select",
+          "list": "services",
+          "required": true
+        },
+        {
+          "key": "region",
+          "label": "شهر / منطقه",
+          "kind": "select",
+          "list": "regions"
+        },
+        {
+          "key": "publishedAt",
+          "label": "تاریخ انتشار",
+          "kind": "date",
+          "required": true,
+          "default": "today"
+        },
+        {
+          "key": "draft",
+          "label": "پیش‌نویس",
+          "kind": "bool",
+          "default": true,
+          "help": "تا بازبینی نشده روشن بماند."
+        },
+        {
+          "key": "leadForm",
+          "label": "فرم لید پایین مقاله",
+          "kind": "bool",
+          "default": true
+        },
+        {
+          "key": "magnet",
+          "label": "لید مگنت (فایل PDF)",
+          "kind": "select",
+          "list": "magnets",
+          "default": "auto",
+          "help": "«خودکار» = فایلِ مرتبط با خدمت و برچسب‌های مقاله. یا یک فایل مشخص را انتخاب کنید."
+        },
+        {
+          "key": "generatedBy",
+          "label": "تولیدشده توسط",
+          "kind": "select",
+          "options": [
+            [
+              "human",
+              "انسان"
+            ],
+            [
+              "agent",
+              "هوش مصنوعی"
+            ]
+          ],
+          "default": "human"
+        },
+        {
+          "key": "cover",
+          "label": "تصویر شاخص",
+          "kind": "cover"
+        },
+        {
+          "key": "faq",
+          "label": "پرسش‌های متداول",
+          "kind": "faq",
+          "group": "extra",
+          "help": "هر پرسش و پاسخ کوتاه. برای نتیجه‌های گوگل و پاسخ‌گوهای هوشمند مفید است."
+        },
+        {
+          "key": "sources",
+          "label": "منابع",
+          "kind": "sources",
+          "help": "هر منبع: عنوان و لینک اختیاری."
+        }
+      ],
+      "rules": [
+        {
+          "id": "required",
+          "level": "error"
+        },
+        {
+          "id": "lengths",
+          "level": "error"
+        },
+        {
+          "id": "slug-valid",
+          "level": "error"
+        },
+        {
+          "id": "magnet-valid",
+          "level": "error"
+        },
+        {
+          "id": "slug-unique",
+          "level": "error"
+        },
+        {
+          "id": "cover-alt",
+          "level": "error"
+        },
+        {
+          "id": "no-h1",
+          "level": "error"
+        },
+        {
+          "id": "no-markers",
+          "level": "error"
+        },
+        {
+          "id": "banned-claims",
+          "level": "error"
+        },
+        {
+          "id": "internal-links",
+          "level": "error"
+        },
+        {
+          "id": "no-html",
+          "level": "error"
+        },
+        {
+          "id": "direct-answer",
+          "level": "warning",
+          "params": {
+            "maxWords": 60
+          }
+        },
+        {
+          "id": "title-length",
+          "level": "warning",
+          "params": {
+            "max": 60
+          }
+        },
+        {
+          "id": "faq-min",
+          "level": "warning",
+          "params": {
+            "min": 3
+          }
+        },
+        {
+          "id": "sources-min",
+          "level": "warning",
+          "params": {
+            "min": 1
+          }
+        },
+        {
+          "id": "headings-min",
+          "level": "warning",
+          "params": {
+            "min": 3
+          }
+        },
+        {
+          "id": "similar-title",
+          "level": "warning",
+          "params": {
+            "threshold": 0.7
+          }
+        },
+        {
+          "id": "word-count",
+          "level": "warning",
+          "params": {
+            "min": 450
+          }
+        },
+        {
+          "id": "callout-syntax",
+          "level": "error"
+        },
+        {
+          "id": "callout-use",
+          "level": "warning",
+          "params": {}
+        },
+        {
+          "id": "internal-links-count",
+          "level": "warning",
+          "params": {
+            "min": 2,
+            "max": 6
+          }
+        },
+        {
+          "id": "link-draft",
+          "level": "warning"
+        },
+        {
+          "id": "generic-anchor",
+          "level": "warning"
+        },
+        {
+          "id": "primary-keyword",
+          "level": "warning"
+        },
+        {
+          "id": "keyword-density",
+          "level": "warning",
+          "params": {
+            "max": 0.03
+          }
+        }
+      ]
+    }
+  }
+}
