@@ -31,6 +31,11 @@ jobs:
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL }}
+          SITE_MODE: ${{ vars.SITE_MODE }}
+          PUBLIC_GFORM_ACTION: ${{ vars.PUBLIC_GFORM_ACTION }}
+          PUBLIC_GFORM_FIELDS: ${{ vars.PUBLIC_GFORM_FIELDS }}
+          PUBLIC_LEADS_MIRROR: ${{ vars.PUBLIC_LEADS_MIRROR }}
+          PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

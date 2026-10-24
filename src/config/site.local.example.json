@@ -1,0 +1,9 @@
+{
+  "_توضیح": "این فایل را به site.local.json کپی کنید (در گیت نیست). هر کلیدی که اینجا بگذارید روی site.config.json می‌نشیند. برای build در GitHub Actions به‌جای این فایل از Variables (PUBLIC_GFORM_*) استفاده کنید.",
+  "leads": {
+    "googleForm": {
+      "action": "https://docs.google.com/forms/d/e/XXXX/formResponse",
+      "fields": { "name": "entry.1", "phone": "entry.2", "service": "entry.3", "region": "entry.4", "message": "entry.5", "page": "entry.6", "source": "entry.7", "utm": "entry.8" }
+    }
+  }
+}

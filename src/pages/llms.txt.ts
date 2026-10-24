@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro';
 import { site } from '../config';
-import { getArticles, enabledServices, getRegions } from '../lib/content';
+import { getArticles, getGuides, enabledServices, getRegions } from '../lib/content';
 import { abs } from '../lib/seo';
 import { channels } from '../lib/links';
 
 export const GET: APIRoute = async () => {
   const arts = await getArticles();
+  const guides = await getGuides();
   const L: string[] = [];
   L.push(`# ${site.brand.name_fa} (${site.brand.name_en})`, '');
   L.push(`> ${site.seo.defaultDescription}`, '');
@@ -17,6 +18,10 @@ export const GET: APIRoute = async () => {
   if (arts.length) {
     L.push('', '## مقالات');
     arts.forEach((a) => L.push(`- [${a.data.title}](${abs(`/articles/${a.id}/`)}): ${a.data.description}`));
+  }
+  if (guides.length) {
+    L.push('', '## راهنمای مجوز هر رسته');
+    guides.forEach((g) => L.push(`- [${g.data.title}](${abs(`/guides/${g.id}/`)}): ${g.data.description}`));
   }
   L.push('', '## تماس');
   L.push(`- [فرم مشاوره رایگان](${abs('/contact/')})`);

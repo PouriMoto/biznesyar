@@ -5,14 +5,15 @@ import Icon from '../components/Icon.astro';
 import LeadForm from '../components/LeadForm.astro';
 import { site } from '../config';
 import { channels } from '../lib/links';
+import home from '../data/home.json';
 const ch = channels();
 ---
-<BaseLayout title="تماس با ما" description="برای مشاوره رایگان درباره جواز کسب و امور اداری کسب‌وکار با بیزنس‌یار تماس بگیرید یا پیام بدهید." leadHere>
+<BaseLayout title="تماس با ما" description={home.meta.contact.description} leadHere>
   <div class="page-head">
     <div class="container">
       <Breadcrumbs items={[{ name: 'تماس' }]} />
-      <h1>تماس با ما</h1>
-      <p>فرم را پر کنید یا از راه‌های زیر پیام بدهید.</p>
+      <h1>{home.contact.title}</h1>
+      <p>{home.contact.subtitle}</p>
     </div>
   </div>
   <div class="container aside-layout">

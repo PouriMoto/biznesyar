@@ -1,0 +1,10 @@
+keyword,service,region,intent,priority,notes
+جواز کسب بندرعباس,business-license,bandar-abbas,informational,high,
+مدارک جواز کسب,business-license,,informational,high,
+مراحل دریافت جواز کسب,business-license,,informational,high,
+جواز کسب میناب,business-license,minab,local,medium,
+جواز کسب رودان,business-license,rudan,local,medium,
+جواز کسب قشم,business-license,qeshm,local,medium,منطقه آزاد؛ مقررات متفاوت است
+جواز کسب کیش,business-license,kish,local,medium,منطقه آزاد؛ مقررات متفاوت است
+ثبت شرکت بندرعباس,company-registration,bandar-abbas,commercial,high,
+کارت بازرگانی چگونه گرفته می‌شود,trade-card,,informational,medium,

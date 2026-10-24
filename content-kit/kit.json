@@ -1,0 +1,14 @@
+{
+  "name": "bizyaar",
+  "version": 1,
+  "lang": "fa",
+  "dir": "rtl",
+  "studio": {
+    "briefForm": {
+      "action": "",
+      "key": "",
+      "fields": { "key": "", "type": "", "title": "", "job": "" }
+    },
+    "github": { "repo": "", "branch": "main" }
+  }
+}

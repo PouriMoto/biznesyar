@@ -1,0 +1,126 @@
+---
+import { render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import Callout from '../../components/mdx/Callout.astro';
+import Figure from '../../components/mdx/Figure.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import LeadMagnet from '../../components/LeadMagnet.astro';
+import Faq from '../../components/Faq.astro';
+import { getGuides, relatedGuides, allServices, getRegions } from '../../lib/content';
+import { getTrade } from '../../lib/trades';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../lib/seo';
+import { leadsOn } from '../../lib/leads';
+import { formatDate, readingMinutes, toFa } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const all = await getGuides();
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry, all } }));
+}
+const { entry, all } = Astro.props;
+const { Content, headings } = await render(entry);
+const d = entry.data;
+const path = `/guides/${entry.id}/`;
+const trade = getTrade(d.trade);
+const service = allServices().find((s) => s.slug === d.service);
+const region = getRegions().find((r) => r.slug === d.region);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const more = relatedGuides(all, entry);
+const og = d.cover ? await getImage({ src: d.cover.src, width: 1200, height: 630, format: 'jpg' }) : null;
+---
+<BaseLayout
+  title={d.title}
+  description={d.description}
+  ogType="article"
+  image={og?.src}
+  noindex={d.draft}
+  leadHere
+  jsonLd={[
+    articleSchema({ title: d.title, description: d.description, path, published: d.publishedAt, updated: d.updatedAt, image: og?.src }),
+    breadcrumbSchema([{ name: 'خانه', path: '/' }, { name: 'راهنماها', path: '/guides/' }, { name: d.title, path }]),
+    faqSchema(d.faq)
+  ]}
+>
+  <div class="progress" aria-hidden="true"></div>
+  <div class="page-head article-head">
+    <div class="container narrow-head">
+      <Breadcrumbs items={[{ name: 'راهنماها', path: '/guides/' }, { name: d.title }]} />
+      <div class="meta">
+        {trade && <span class="badge">{trade.name}</span>}
+        {service && <span class="badge">{service.title}</span>}
+        {region && <span class="badge">{region.name}</span>}
+        {d.draft && <span class="badge draft">پیش‌نویس؛ منتشر نمی‌شود</span>}
+        <span>{formatDate(d.updatedAt ?? d.publishedAt)}</span>
+        <span>{toFa(readingMinutes(entry.body))} دقیقه مطالعه</span>
+        {d.reviewedAt && <span class="badge"><Icon name="shield-check" />بازبینی‌شده در {formatDate(d.reviewedAt)}</span>}
+      </div>
+      <h1>{d.title}</h1>
+      <p>{d.description}</p>
+    </div>
+  </div>
+
+  <div class="container article-layout" data-article>
+    {toc.length > 1 && (
+      <>
+        <nav class="toc toc-desktop" aria-label="فهرست مطالب">
+          <h2>در این راهنما</h2>
+          <ol>{toc.map((h) => <li class={`l${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </nav>
+        <details class="toc-mobile">
+          <summary>فهرست مطالب</summary>
+          <ol>{toc.map((h) => <li class={`l${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </details>
+      </>
+    )}
+    <article>
+      {d.cover && (
+        <figure class="cover">
+          <Image src={d.cover.src} alt={d.cover.alt} widths={[480, 800, 1200]} sizes="(min-width: 1000px) 44rem, 100vw" loading="eager" fetchpriority="high" />
+          {d.cover.caption && <figcaption class="meta" style="justify-content:center;margin-top:.5rem">{d.cover.caption}</figcaption>}
+        </figure>
+      )}
+      <div class="prose"><Content components={{ Callout, Figure }} /></div>
+
+      <Faq items={d.faq} />
+
+      {d.sources.length > 0 && (
+        <section class="sources" style="margin-top:2rem">
+          <h2 style="font-size:1.1rem">منابع</h2>
+          <ul>{d.sources.map((s) => <li>{s.url ? <a href={s.url} rel="noopener nofollow" target="_blank">{s.title}</a> : s.title}</li>)}</ul>
+        </section>
+      )}
+
+      {d.magnet !== false && leadsOn('magnet') && <LeadMagnet service={d.service} id={typeof d.magnet === 'string' ? d.magnet : undefined} tags={[d.trade]} category={d.trade} />}
+      {d.leadForm && (
+        <div class="article-cta">
+          <LeadForm compact service={d.service} region={d.region ?? ''} heading="این مسیر را به ما بسپارید" sub="شماره‌تان را بگذارید تا درباره پروندهٔ شما مشاورهٔ رایگان بگیرید." formName={`guide_${entry.id}`} />
+        </div>
+      )}
+
+      <section style="margin-top:2.5rem">
+        <h2>صفحه‌های مرتبط</h2>
+        <ul>
+          {service && <li><a href={`/services/${service.slug}/`}>خدمت «{service.title}»</a></li>}
+          {region && <li><a href={`/areas/${region.slug}/`}>خدمات در {region.name}</a></li>}
+          <li><a href="/contact/">مشاورهٔ رایگان</a></li>
+        </ul>
+      </section>
+
+      {more.length > 0 && (
+        <section style="margin-top:2rem">
+          <h2>راهنماهای مرتبط</h2>
+          <div class="art-list">
+            {more.map((g) => (
+              <a class="art-item" href={`/guides/${g.id}/`}>
+                <div class="meta"><span class="badge">{getTrade(g.data.trade)?.name ?? g.data.trade}</span></div>
+                <h3>{g.data.title}</h3><p>{g.data.description}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </article>
+  </div>
+</BaseLayout>

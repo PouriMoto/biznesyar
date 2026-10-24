@@ -24,7 +24,7 @@ const themeVars = `--primary:${t.primary};--accent:${t.accent};--bg:${t.bg};--te
 const leadHref = leadHere ? '#lead' : '/contact/#lead';
 const schemas = [orgSchema(), websiteSchema(), ...jsonLd].filter(Boolean);
 const apiBase = import.meta.env.PUBLIC_API_BASE ?? (import.meta.env.DEV ? 'http://127.0.0.1:8090' : '');
-const clientCfg = JSON.stringify({ analytics: site.analytics, api: { ...site.api, base: apiBase }, payments: site.payments, mode: (site as any).mode, leads: (site as any).leads ? { provider: (site as any).leads.provider, googleForm: (site as any).leads.googleForm } : undefined });
+const clientCfg = JSON.stringify({ analytics: site.analytics, api: { ...site.api, base: apiBase }, payments: site.payments, mode: (site as any).mode, leads: (site as any).leads ? { provider: (site as any).leads.provider, googleForm: (site as any).leads.googleForm, mirror: !!(site as any).leads.mirrorToGoogleForm } : undefined });
 ---
 <!doctype html>
 <html lang="fa" dir="rtl" style={themeVars}>

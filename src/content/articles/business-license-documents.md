@@ -6,7 +6,7 @@ tags: [مدارک, جواز کسب]
 service: business-license
 region: bandar-abbas
 publishedAt: 2026-10-06
-draft: false
+draft: true
 faq:
   - q: آیا مدارک برای همه رسته‌ها یکسان است؟
     a: خیر. مدارک پایه مشابه است اما بعضی رسته‌ها مدارک یا مجوزهای تکمیلی می‌خواهند.

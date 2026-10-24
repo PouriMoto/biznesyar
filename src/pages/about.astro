@@ -4,7 +4,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import LeadForm from '../components/LeadForm.astro';
 import home from '../data/home.json';
 ---
-<BaseLayout title="درباره ما" description="با بیزنس‌یار آشنا شوید؛ دستیار کسب‌وکار در بندرعباس و هرمزگان." leadHere>
+<BaseLayout title="درباره ما" description={home.meta.about.description} leadHere>
   <div class="page-head">
     <div class="container">
       <Breadcrumbs items={[{ name: 'درباره ما' }]} />

@@ -1,8 +1,14 @@
 ---
 import { site } from '../config';
-interface Props { service?: string; id?: string }
-const { service, id } = Astro.props;
-const m = (site as any).magnets?.find((x: any) => (id ? x.id === id : x.services.includes(service)));
+interface Props { service?: string; id?: string; tags?: string[]; category?: string }
+const { service, id, tags = [], category = '' } = Astro.props;
+// انتخاب فایل: شناسهٔ صریح مقاله ← وگرنه بین فایل‌های هم‌خدمت، آن‌که برچسب/دسته‌اش با مقاله بیشتر می‌خورد ← وگرنه اولی
+const all: any[] = (site as any).magnets ?? [];
+const pool = id ? all.filter((x) => x.id === id) : all.filter((x) => (x.services ?? []).includes(service));
+// برچسب مقاله دو امتیاز، دسته یک امتیاز
+const score = (x: any) => (x.tags ?? []).reduce((n: number, t: string) => n + (tags.includes(t) ? 2 : t === category ? 1 : 0), 0);
+const m = [...pool].sort((a, b) => score(b) - score(a))[0];
+if (id && !m) console.warn(`[لید مگنت] شناسهٔ «${id}» در site.config.json ← magnets پیدا نشد؛ در این مقاله لید مگنتی نمایش داده نمی‌شود.`);
 ---
 {m && (
   <section class="magnet" data-magnet={m.id} data-file={m.file} data-service={service ?? ''}>

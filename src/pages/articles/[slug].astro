@@ -87,7 +87,7 @@ const og = d.cover ? await getImage({ src: d.cover.src, width: 1200, height: 630
         </section>
       )}
 
-      {d.magnet && leadsOn('magnet') && <LeadMagnet service={d.service ?? "business-license"} />}
+      {d.magnet !== false && leadsOn('magnet') && <LeadMagnet service={d.service} id={typeof d.magnet === 'string' ? d.magnet : undefined} tags={d.tags ?? []} category={d.category} />}
       {d.leadForm && (
         <div class="article-cta">
           <LeadForm compact service={d.service ?? ''} region={d.region ?? ''} heading="این مسیر را به ما بسپارید" sub="شماره‌تان را بگذارید تا درباره پرونده شما مشاوره رایگان بدهیم." formName={`article_${entry.id}`} id="lead" placement="article" />

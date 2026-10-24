@@ -5,19 +5,31 @@ export interface Lead { name: string; phone: string; service: string; region: st
 const PENDING = 'bz_pending_leads';
 const configured = (a?: string) => !!a && !/FORM_ID_HERE/.test(a);
 
-async function post(lead: Lead): Promise<void> {
-  if (cfg.mode === 'static') {
-    const g = cfg.leads?.googleForm;
-    if (!configured(g?.action)) { console.error('[bizyaar] آدرس گوگل‌فرم در site.config.json تنظیم نشده است'); throw new Error('not configured'); }
-    const body = new URLSearchParams();
-    (Object.keys(g.fields) as (keyof Lead)[]).forEach((k) => { if (g.fields[k] && lead[k] !== undefined) body.set(g.fields[k], String(lead[k])); });
-    // no-cors: پاسخ قابل‌خواندن نیست، ولی خطای شبکه/فیلتر با throw مشخص می‌شود
-    await fetch(g.action, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, keepalive: true });
-    return;
-  }
+async function postForm(lead: Lead): Promise<void> {
+  const g = cfg.leads?.googleForm;
+  if (!configured(g?.action)) { console.error('[bizyaar] آدرس گوگل‌فرم تنظیم نشده (site.local.json یا PUBLIC_GFORM_ACTION)'); throw new Error('not configured'); }
+  const body = new URLSearchParams();
+  (Object.keys(g.fields) as (keyof Lead)[]).forEach((k) => { if (g.fields[k] && lead[k] !== undefined) body.set(g.fields[k], String(lead[k])); });
+  // no-cors: پاسخ قابل‌خواندن نیست، ولی خطای شبکه/فیلتر با throw مشخص می‌شود
+  await fetch(g.action, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, keepalive: true });
+}
+
+async function postBackend(lead: Lead): Promise<void> {
   const res = await fetch((cfg.api?.base || '') + (cfg.api?.leads || '/api/collections/leads/records'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) });
   if (res.status === 429) throw new Error('rate');
   if (!res.ok) throw new Error('http ' + res.status);
+}
+
+// static ← فقط گوگل‌فرم | backend ← PocketBase و (اگر leads.mirrorToGoogleForm روشن و فرم تنظیم است) همزمان گوگل‌فرم.
+// در حالت backend اگر یکی از دو مقصد موفق شد، لید از دست نرفته است.
+async function post(lead: Lead): Promise<void> {
+  if (cfg.mode === 'static') return postForm(lead);
+  const mirror = cfg.leads?.mirror && configured(cfg.leads?.googleForm?.action);
+  const [pb, gf] = await Promise.allSettled([postBackend(lead), mirror ? postForm(lead) : Promise.reject(new Error('mirror off'))]);
+  if (pb.status === 'fulfilled') return;
+  if ((pb.reason as Error).message === 'rate') throw pb.reason;
+  if (gf.status === 'fulfilled') return;
+  throw pb.reason;
 }
 
 export async function sendLead(lead: Lead): Promise<void> {
