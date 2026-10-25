@@ -13,7 +13,7 @@
     "group": "خدمات شخصی",
     "aliases": [],
     "notes": [],
-    "verified": false
+    "verified": true
   },
   {
     "slug": "cafe",
@@ -21,7 +21,7 @@
     "group": "غذا و پذیرایی",
     "aliases": [],
     "notes": [],
-    "verified": false
+    "verified": true
   },
   {
     "slug": "restaurant",
