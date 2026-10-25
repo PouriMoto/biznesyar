@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import Faq from '../../components/Faq.astro';
+import { Image } from 'astro:assets';
+import { getExperiences, type Experience, type ExperienceItemChecklist, type ExperienceItemQuiz } from '../../lib/experiences';
+import { getArticles } from '../../lib/content';
+import { breadcrumbSchema, faqSchema } from '../../lib/seo';
+import { toFa } from '../../lib/format';
+
+export async function getStaticPaths() {
+  return getExperiences().map((e) => ({ params: { slug: e.slug }, props: { e } }));
+}
+const { e } = Astro.props as { e: Experience };
+const allArticles = await getArticles();
+const related = allArticles.filter((a) => e.relatedArticles?.includes(a.id));
+const toolFaq = [
+  { q: 'نتیجهٔ این صفحه کجا ذخیره می‌شود؟', a: 'نتیجه فقط در همین مرورگر شما نگه داشته می‌شود؛ ما آن را نمی‌بینیم، مگر اینکه خودتان با ثبت درخواست مشاوره آن را برای ما بفرستید.' },
+  { q: 'آیا این جایگزین مشاورهٔ تخصصی است؟', a: 'نه. این فقط یک نقطهٔ شروع سریع است. برای فهرست دقیق مخصوص رستهٔ خودتان، مشاورهٔ رایگان را رزرو کنید.' }
+];
+---
+<BaseLayout
+  title={e.title}
+  description={e.description}
+  noindex={e.draft}
+  leadHere
+  jsonLd={[
+    breadcrumbSchema([{ name: 'خانه', path: '/' }, { name: 'ابزارها', path: '/tools/' }, { name: e.title, path: `/tools/${e.slug}/` }]),
+    faqSchema(toolFaq)
+  ]}
+>
+  <div class="page-head">
+    <div class="container">
+      <Breadcrumbs items={[{ name: 'ابزارها', path: '/tools/' }, { name: e.shortTitle }]} />
+      <h1>{e.title}</h1>
+      <p>{e.intro}</p>
+      {e.draft && <span class="badge draft">پیش‌نویس — قبل از انتشار بازبینی کنید</span>}
+    </div>
+  </div>
+
+  {e.reviewNote && (
+    <div class="container" style="max-width:820px">
+      <aside class="callout callout-warning" role="note"><strong>یادداشت</strong><div><p>{e.reviewNote}</p></div></aside>
+    </div>
+  )}
+
+  <div class="container" style="max-width:820px">
+    <div class="exp" data-experience data-kind={e.kind} data-slug={e.slug} data-service={e.relatedService ?? ''} data-total={e.items.length}>
+      <script type="application/json" data-exp-tiers set:html={JSON.stringify(e.tiers).replace(/</g, '\\u003c')} />
+
+      {e.kind === 'checklist' ? (
+        <>
+          <div class="exp-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-exp-progress>
+            <div class="exp-progress-bar" data-exp-progress-bar></div>
+          </div>
+          <p class="exp-progress-label" data-exp-progress-label>۰٪ آماده</p>
+          <ul class="exp-list">
+            {(e.items as ExperienceItemChecklist[]).map((it) => (
+              <li class="exp-check">
+                <label>
+                  <input type="checkbox" data-exp-item value={it.id} />
+                  <span>{it.text}{it.hint && <small>{it.hint}</small>}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <>
+          <p class="exp-score" data-exp-score>امتیاز: ۰ از {toFa(e.items.length)}</p>
+          <ol class="exp-list exp-quiz">
+            {(e.items as ExperienceItemQuiz[]).map((it, i) => (
+              <li class="exp-q" data-exp-q data-id={it.id} data-answer={String(it.answer)}>
+                <p class="exp-q-text"><span class="exp-q-num">{toFa(i + 1)}</span>{it.text}</p>
+                <div class="exp-q-actions">
+                  <button type="button" class="btn btn-ghost" data-exp-answer="true">درست</button>
+                  <button type="button" class="btn btn-ghost" data-exp-answer="false">غلط</button>
+                </div>
+                <p class="exp-q-explain" hidden>{it.explain}</p>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+
+      <div class="exp-result" data-exp-result hidden>
+        <h2 data-exp-result-title></h2>
+        <p data-exp-result-text></p>
+        <div class="exp-share" data-exp-share-box>
+          <button type="button" class="btn btn-ghost" data-exp-share="native" hidden>اشتراک‌گذاری</button>
+          <button type="button" class="btn btn-ghost" data-exp-share="copy">کپی نتیجه و لینک</button>
+          <a class="btn btn-ghost" data-exp-share="whatsapp" target="_blank" rel="noopener">اشتراک در واتساپ</a>
+        </div>
+        <a class="btn btn-primary exp-cta" href="#lead" data-track="cta_click" data-label={`exp_${e.slug}`}>{e.ctaLabel}</a>
+        <p class="exp-share-note" data-exp-share-copied hidden>کپی شد؛ حالا در هر پیام‌رسانی که می‌خواهید بفرستید.</p>
+      </div>
+    </div>
+  </div>
+
+  {related.length > 0 && (
+    <div class="container" style="max-width:820px">
+      <h2>برای مطالعهٔ بیشتر</h2>
+      <div class="art-list">
+        {related.map((a) => (
+          <a class="art-item" href={`/articles/${a.id}/`}>
+            {a.data.cover && (
+              <span class="art-thumb">
+                <Image src={a.data.cover.src} alt={a.data.cover.alt} width={110} height={110} loading="lazy" />
+              </span>
+            )}
+            <span class="art-item-body">
+              <h3>{a.data.title}</h3>
+              <p>{a.data.description}</p>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div class="container" style="max-width:820px" id="lead">
+    <LeadForm
+      heading="نتیجه‌تان را دیدید؟ ادامه بدهیم"
+      sub="نام و شماره‌تان را بگذارید تا با همین اطلاعات با شما تماس بگیریم."
+      service={e.relatedService}
+      formName={`experience_${e.slug}`}
+      placement="article"
+    />
+  </div>
+
+  <div class="container" style="max-width:820px"><Faq items={toolFaq} title="سؤال دربارهٔ همین صفحه" /></div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/experience';
+</script>

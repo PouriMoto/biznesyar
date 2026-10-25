@@ -28,18 +28,20 @@ const others = guides.filter((g) => !getTrade(g.data.trade));
           <div class="art-list">
             {items.map((g) => (
               <a class="art-item" href={`/guides/${g.id}/`}>
-                <div class="meta">
-                  <span class="badge">{services.find((s) => s.slug === g.data.service)?.title ?? g.data.service}</span>
-                  {g.data.region && <span class="badge">{regions.find((r) => r.slug === g.data.region)?.name ?? g.data.region}</span>}
-                  {g.data.draft && <span class="badge draft">پیش‌نویس</span>}
-                </div>
-                <h3>{g.data.title}</h3><p>{g.data.description}</p>
+                <span class="art-item-body">
+                  <div class="meta">
+                    <span class="badge">{services.find((s) => s.slug === g.data.service)?.title ?? g.data.service}</span>
+                    {g.data.region && <span class="badge">{regions.find((r) => r.slug === g.data.region)?.name ?? g.data.region}</span>}
+                    {g.data.draft && <span class="badge draft">پیش‌نویس</span>}
+                  </div>
+                  <h3>{g.data.title}</h3><p>{g.data.description}</p>
+                </span>
               </a>
             ))}
           </div>
         </section>
       ))}
-      {others.length > 0 && <div class="art-list">{others.map((g) => <a class="art-item" href={`/guides/${g.id}/`}><h3>{g.data.title}</h3><p>{g.data.description}</p></a>)}</div>}
+      {others.length > 0 && <div class="art-list">{others.map((g) => <a class="art-item" href={`/guides/${g.id}/`}><span class="art-item-body"><h3>{g.data.title}</h3><p>{g.data.description}</p></span></a>)}</div>}
     </div>
     <aside class="sticky"><LeadForm compact heading="رستهٔ شما چیست؟" sub="شماره‌تان را بگذارید تا مدارک رستهٔ شما را بگوییم." formName="guides_index" /></aside>
   </div>

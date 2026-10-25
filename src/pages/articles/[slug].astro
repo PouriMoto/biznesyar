@@ -100,8 +100,15 @@ const og = d.cover ? await getImage({ src: d.cover.src, width: 1200, height: 630
           <div class="art-list">
             {more.map((a) => (
               <a class="art-item" href={`/articles/${a.id}/`}>
-                <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
-                <h3>{a.data.title}</h3><p>{a.data.description}</p>
+                {a.data.cover && (
+                  <span class="art-thumb">
+                    <Image src={a.data.cover.src} alt={a.data.cover.alt} width={110} height={110} loading="lazy" />
+                  </span>
+                )}
+                <span class="art-item-body">
+                  <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
+                  <h3>{a.data.title}</h3><p>{a.data.description}</p>
+                </span>
               </a>
             ))}
           </div>

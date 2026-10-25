@@ -2,8 +2,11 @@
 import { site } from '../config';
 import Icon from './Icon.astro';
 import { isStatic } from '../lib/leads';
+import { getExperiences } from '../lib/experiences';
+const hasTools = getExperiences().length > 0;
 const nav = [
   { label: 'خدمات', href: '/#services' },
+  ...(hasTools ? [{ label: 'ابزارها', href: '/tools/' }] : []),
   { label: 'مناطق', href: '/#areas' },
   { label: 'مقالات', href: '/articles/' },
   { label: 'درباره ما', href: '/about/' },
@@ -15,7 +18,7 @@ const { leadHref = '/contact/#lead' } = Astro.props;
 <header class="site-header">
   <div class="container">
     <a class="brand" href="/" aria-label={site.brand.name_fa}>
-      <img src={site.assets.logo} width="36" height="36" alt="" />
+      <img src={site.assets.logo} width="36" height="36" alt={`لوگوی ${site.brand.name_fa}`} />
       {site.brand.showNameBesideLogo && <span>{site.brand.name_fa}</span>}
     </a>
     <nav class="nav-desktop" aria-label="منوی اصلی">

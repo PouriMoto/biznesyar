@@ -8,6 +8,8 @@ import { site } from '../config';
 import home from '../data/home.json';
 import { channels, phones } from '../lib/links';
 import { allServices, getRegions, getArticles } from '../lib/content';
+import { getExperiences } from '../lib/experiences';
+import { Image } from 'astro:assets';
 import { faqSchema } from '../lib/seo';
 import { isStatic } from '../lib/leads';
 import { formatDate } from '../lib/format';
@@ -18,6 +20,7 @@ const office = site.contact as any;
 const services = allServices();
 const regions = getRegions();
 const latest = (await getArticles()).slice(0, 3);
+const experiences = getExperiences();
 ---
 <BaseLayout jsonLd={[faqSchema(home.faq)]} leadHere>
   <section class="hero">
@@ -65,6 +68,24 @@ const latest = (await getArticles()).slice(0, 3);
     </div>
   </section>
 
+  {experiences.length > 0 && (
+    <section class="section section-tint" id="tools">
+      <div class="container">
+        <h2>{home.sections.experiences.title}</h2>
+        <p class="lead-text">{home.sections.experiences.lead}</p>
+        <div class="rows">
+          {experiences.map((e) => (
+            <a class="row-item" href={`/tools/${e.slug}/`}>
+              <span class="ico"><Icon name={e.icon} /></span>
+              <span><h3>{e.shortTitle}</h3><p>{e.description}</p></span>
+              <Icon name="arrow-left" class="go" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="section section-tint">
     <div class="container split">
       <div>
@@ -105,9 +126,16 @@ const latest = (await getArticles()).slice(0, 3);
         <div class="art-list">
           {latest.map((a) => (
             <a class="art-item" href={`/articles/${a.id}/`}>
-              <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
-              <h3>{a.data.title}</h3>
-              <p>{a.data.description}</p>
+              {a.data.cover && (
+                <span class="art-thumb">
+                  <Image src={a.data.cover.src} alt={a.data.cover.alt} width={110} height={110} loading="lazy" />
+                </span>
+              )}
+              <span class="art-item-body">
+                <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
+                <h3>{a.data.title}</h3>
+                <p>{a.data.description}</p>
+              </span>
             </a>
           ))}
         </div>

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import LeadForm from '../../components/LeadForm.astro';
+import { Image } from 'astro:assets';
 import { getArticles } from '../../lib/content';
 import { breadcrumbSchema } from '../../lib/seo';
 import { formatDate, readingMinutes, toFa } from '../../lib/format';
@@ -21,14 +22,21 @@ const articles = await getArticles();
         <div class="art-list">
           {articles.map((a) => (
             <a class="art-item" href={`/articles/${a.id}/`}>
-              <div class="meta">
-                <span class="badge">{a.data.category}</span>
-                {a.data.draft && <span class="badge draft">پیش‌نویس</span>}
-                <span>{formatDate(a.data.publishedAt)}</span>
-                <span>{toFa(readingMinutes(a.body))} دقیقه مطالعه</span>
-              </div>
-              <h3>{a.data.title}</h3>
-              <p>{a.data.description}</p>
+              {a.data.cover && (
+                <span class="art-thumb">
+                  <Image src={a.data.cover.src} alt={a.data.cover.alt} width={110} height={110} loading="lazy" />
+                </span>
+              )}
+              <span class="art-item-body">
+                <div class="meta">
+                  <span class="badge">{a.data.category}</span>
+                  {a.data.draft && <span class="badge draft">پیش‌نویس</span>}
+                  <span>{formatDate(a.data.publishedAt)}</span>
+                  <span>{toFa(readingMinutes(a.body))} دقیقه مطالعه</span>
+                </div>
+                <h3>{a.data.title}</h3>
+                <p>{a.data.description}</p>
+              </span>
             </a>
           ))}
         </div>

@@ -114,8 +114,10 @@ const og = d.cover ? await getImage({ src: d.cover.src, width: 1200, height: 630
           <div class="art-list">
             {more.map((g) => (
               <a class="art-item" href={`/guides/${g.id}/`}>
-                <div class="meta"><span class="badge">{getTrade(g.data.trade)?.name ?? g.data.trade}</span></div>
-                <h3>{g.data.title}</h3><p>{g.data.description}</p>
+                <span class="art-item-body">
+                  <div class="meta"><span class="badge">{getTrade(g.data.trade)?.name ?? g.data.trade}</span></div>
+                  <h3>{g.data.title}</h3><p>{g.data.description}</p>
+                </span>
               </a>
             ))}
           </div>

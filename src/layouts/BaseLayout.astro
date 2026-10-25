@@ -17,7 +17,9 @@ interface Props {
 }
 const { title, description = site.seo.defaultDescription, ogType = 'website', noindex = false, jsonLd = [], image = site.assets.og_image, leadHere = false } = Astro.props;
 const canonical = abs(Astro.url.pathname);
-const fullTitle = title ? `${title} | ${site.brand.name_fa}` : `${site.brand.name_fa} | ${site.brand.tagline}`;
+// عنوان تب/گوگل: اگر با نام برند از ۶۵ نویسه بلندتر شود، نام برند حذف می‌شود (هشدار Title too long در Bing)
+const withBrand = title ? `${title} | ${site.brand.name_fa}` : '';
+const fullTitle = title ? (withBrand.length <= 65 ? withBrand : title) : `${site.brand.name_fa} | ${site.brand.tagline}`;
 const robots = noindex || site.seo.noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
 const t = site.theme;
 const themeVars = `--primary:${t.primary};--accent:${t.accent};--bg:${t.bg};--text:${t.text};--radius:${t.radius}`;

@@ -4,6 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Icon from '../../components/Icon.astro';
 import LeadForm from '../../components/LeadForm.astro';
 import LeadMagnet from '../../components/LeadMagnet.astro';
+import { Image } from 'astro:assets';
 import Faq from '../../components/Faq.astro';
 import { enabledServices, getRegions, getArticles } from '../../lib/content';
 import { breadcrumbSchema, faqSchema, serviceSchema } from '../../lib/seo';
@@ -72,8 +73,15 @@ const path = `/services/${svc.slug}/`;
           <div class="art-list">
             {arts.map((a) => (
               <a class="art-item" href={`/articles/${a.id}/`}>
-                <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
-                <h3>{a.data.title}</h3><p>{a.data.description}</p>
+                {a.data.cover && (
+                  <span class="art-thumb">
+                    <Image src={a.data.cover.src} alt={a.data.cover.alt} width={110} height={110} loading="lazy" />
+                  </span>
+                )}
+                <span class="art-item-body">
+                  <div class="meta"><span class="badge">{a.data.category}</span><span>{formatDate(a.data.publishedAt)}</span></div>
+                  <h3>{a.data.title}</h3><p>{a.data.description}</p>
+                </span>
               </a>
             ))}
           </div>

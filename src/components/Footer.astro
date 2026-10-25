@@ -12,7 +12,7 @@ const c = site.contact as any;
   <div class="container">
     <div class="foot-grid">
       <div class="office">
-        <div class="foot-brand"><span data-secret-logo style="display:inline-flex;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none"><img src={site.assets.logo_light} width="36" height="36" alt="" loading="lazy" draggable="false" /></span>{site.brand.name_fa}</div>
+        <div class="foot-brand"><span data-secret-logo style="display:inline-flex;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none"><img src={site.assets.logo_light} width="36" height="36" alt={`لوگوی ${site.brand.name_fa}`} loading="lazy" draggable="false" /></span>{site.brand.name_fa}</div>
         {c.address && <address style="font-style:normal">{c.address}</address>}
         <div class="phones">{phones().map((p) => <a href={p.href} data-track="cta_click" data-label={`footer_${p.number}`}>{p.display}</a>)}</div>
         {c.hours && <span>ساعات کاری: {c.hours}</span>}

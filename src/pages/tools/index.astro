@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import { getExperiences } from '../../lib/experiences';
+import { breadcrumbSchema } from '../../lib/seo';
+
+const experiences = getExperiences();
+---
+<BaseLayout
+  title="ابزارها و تست‌های کوتاه"
+  description="چند تجربهٔ کوتاه و تعاملی دربارهٔ جواز کسب؛ ببینید چقدر آماده‌اید یا چند باور رایج را درست می‌دانید."
+  noindex={experiences.length === 0}
+  jsonLd={[breadcrumbSchema([{ name: 'خانه', path: '/' }, { name: 'ابزارها', path: '/tools/' }])]}
+>
+  <div class="page-head">
+    <div class="container">
+      <Breadcrumbs items={[{ name: 'ابزارها' }]} />
+      <h1>ابزارها و تست‌های کوتاه</h1>
+      <p>چند تجربهٔ کوتاه برای اینکه در ۱ تا ۲ دقیقه ببینید در چه نقطه‌ای هستید؛ بدون نیاز به ثبت شماره.</p>
+    </div>
+  </div>
+  <div class="container">
+    {experiences.length === 0 ? <p>به‌زودی ابزار تازه اضافه می‌شود.</p> : (
+      <div class="rows">
+        {experiences.map((e) => (
+          <a class="row-item" href={`/tools/${e.slug}/`}>
+            <span class="ico"><Icon name={e.icon} /></span>
+            <span><h3>{e.shortTitle}{e.draft && <span class="badge draft" style="margin-inline-start:.5rem">پیش‌نویس</span>}</h3><p>{e.description}</p></span>
+            <Icon name="arrow-left" class="go" />
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
