@@ -1,0 +1,28 @@
+---
+// ابزارهای تعاملی مرتبط با یک مقاله/راهنما (چک‌لیست، کوییز یا ابزارهای اعتبارسنجی ایده).
+// با همان منطق «مطالب مرتبط» در tools/[slug].astro: از experiences.json بر اساس relatedArticles فیلتر می‌شود.
+import Icon from './Icon.astro';
+import { getExperiences } from '../lib/experiences';
+
+interface Props { articleId?: string; service?: string }
+const { articleId, service } = Astro.props;
+const tools = getExperiences().filter(
+  (e) => (articleId && e.relatedArticles?.includes(articleId)) || (service && e.relatedService === service)
+);
+---
+{tools.length > 0 && (
+  <section class="tools-related" aria-label="ابزارهای مرتبط">
+    <h2>ابزارهای رایگان مرتبط</h2>
+    <div class="tools-related-grid">
+      {tools.map((t) => (
+        <a class="tool-mini-card" href={`/tools/${t.slug}/`} data-track="tool_click" data-label={`related_${t.slug}`} style={t.accent ? `--tool-accent:${t.accent}` : ''}>
+          <span class="ico"><Icon name={t.icon} /></span>
+          <span>
+            <strong>{t.shortTitle}</strong>
+            <small>{t.description}</small>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

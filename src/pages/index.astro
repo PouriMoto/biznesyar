@@ -21,6 +21,9 @@ const services = allServices();
 const regions = getRegions();
 const latest = (await getArticles()).slice(0, 3);
 const experiences = getExperiences();
+const validationTools = experiences.filter((e) => e.group === 'validation');
+const otherTools = experiences.filter((e) => e.group !== 'validation');
+const mapQuery = encodeURIComponent(office.address || '');
 ---
 <BaseLayout jsonLd={[faqSchema(home.faq)]} leadHere>
   <section class="hero">
@@ -68,13 +71,32 @@ const experiences = getExperiences();
     </div>
   </section>
 
-  {experiences.length > 0 && (
+  {validationTools.length > 0 && (
+    <section class="section" id="validation-tools">
+      <div class="container">
+        <h2>۴ ابزار رایگان اعتبارسنجی ایده</h2>
+        <p class="lead-text">قبل از هزینه کردن، در کمتر از ۲ دقیقه ببینید ایدهٔ کسب‌وکارتان از ۴ جنبهٔ اصلی چقدر آماده است.</p>
+        <div class="validation-grid">
+          {validationTools.map((e) => (
+            <a class="validation-card" href={`/tools/${e.slug}/`} data-track="cta_click" data-label={`home_${e.slug}`} style={`--v-accent:${e.accent ?? 'var(--primary)'}`}>
+              <span class="ico"><Icon name={e.icon} /></span>
+              <h3>{e.shortTitle}</h3>
+              <p>{e.description}</p>
+              <span class="go">شروع تست <Icon name="arrow-left" /></span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {otherTools.length > 0 && (
     <section class="section section-tint" id="tools">
       <div class="container">
         <h2>{home.sections.experiences.title}</h2>
         <p class="lead-text">{home.sections.experiences.lead}</p>
         <div class="rows">
-          {experiences.map((e) => (
+          {otherTools.map((e) => (
             <a class="row-item" href={`/tools/${e.slug}/`}>
               <span class="ico"><Icon name={e.icon} /></span>
               <span><h3>{e.shortTitle}</h3><p>{e.description}</p></span>
@@ -143,7 +165,7 @@ const experiences = getExperiences();
     </section>
   )}
 
-  <section class="section">
+  <section class="section office-section">
     <div class="container split">
       <div class="office">
         <h2>{home.sections.office.title}</h2>
@@ -151,7 +173,16 @@ const experiences = getExperiences();
         <div class="phones">{ph.map((p) => <a href={p.href} data-track="cta_click" data-label={`office_${p.number}`}>{p.display}</a>)}</div>
         {office.hours && <span>ساعات کاری: {office.hours}</span>}
       </div>
-      <div></div>
+      {office.address && (
+        <div class="office-map">
+          <iframe
+            src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="نقشهٔ دفتر مرکزی"
+          ></iframe>
+        </div>
+      )}
     </div>
   </section>
 

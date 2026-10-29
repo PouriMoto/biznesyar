@@ -9,10 +9,10 @@ function renderBody(md: string): { html: string; toc: { id: string; text: string
   const raw = marked.parse(md || '', { gfm: true, async: false }) as string;
   const box = document.createElement('div');
   box.innerHTML = raw;
-  // کادرها: blockquote که با [!tip|warning|info] شروع می‌شود (مثل remark-callouts سایت)
+  // کادرها: blockquote که با [!tip|warning|info|key] شروع می‌شود (مثل remark-callouts سایت)
   box.querySelectorAll('blockquote').forEach((bq) => {
     const p = bq.querySelector('p');
-    const m = p?.innerHTML.match(/^\[!(tip|warning|info)\][ \t]*([^\n<]*)(?:<br>|\n)?([\s\S]*)$/i);
+    const m = p?.innerHTML.match(/^\[!(tip|warning|info|key)\][ \t]*([^\n<]*)(?:<br>|\n)?([\s\S]*)$/i);
     if (!p || !m) return;
     const aside = document.createElement('aside');
     aside.className = `callout callout-${m[1].toLowerCase()}`;

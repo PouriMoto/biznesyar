@@ -4,6 +4,8 @@ import { Image, getImage } from 'astro:assets';
 import Callout from '../../components/mdx/Callout.astro';
 import Figure from '../../components/mdx/Figure.astro';
 import Video from '../../components/mdx/Video.astro';
+import Mermaid from '../../components/mdx/Mermaid.astro';
+import ToolsRelated from '../../components/ToolsRelated.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Icon from '../../components/Icon.astro';
@@ -76,7 +78,9 @@ const og = d.cover ? await getImage({ src: d.cover.src, width: 1200, height: 630
           {d.cover.caption && <figcaption class="meta" style="justify-content:center;margin-top:.5rem">{d.cover.caption}</figcaption>}
         </figure>
       )}
-      <div class="prose"><Content components={{ Callout, Figure, Video }} /></div>
+      <div class="prose"><Content components={{ Callout, Figure, Video, Mermaid }} /></div>
+
+      <ToolsRelated articleId={entry.id} />
 
       <Faq items={d.faq} />
 

@@ -1,0 +1,11 @@
+---
+// استفاده در MDX: <Mermaid>{`flowchart TD\nA[شروع] --> B[پایان]`}</Mermaid>
+// در Markdown ساده به‌جایش از بلاک کد ```mermaid استفاده کنید (remark-mermaid.mjs خودش تبدیلش می‌کند).
+interface Props { caption?: string }
+const { caption } = Astro.props;
+const raw = await Astro.slots.render('default');
+---
+<figure class="mermaid-diagram" data-mermaid>
+  <pre class="mermaid" set:html={raw} />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

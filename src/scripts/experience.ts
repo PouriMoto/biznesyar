@@ -1,4 +1,6 @@
 // موتور تجربه‌های تعاملی (چک‌لیست/آزمون درست-غلط). داده از src/data/experiences.json می‌آید.
+// اگر experience.private=true باشد (مثل چک‌لیست آمادگی یا ابزارهای اعتبارسنجی ایده)، دکمه‌های اشتراک‌گذاری عمومی اصلاً در Astro رندر نمی‌شوند؛
+// نتیجه فقط در localStorage کاربر و (در صورت ثبت درخواست مشاوره) در پیام فرم لید برای ما دیده می‌شود.
 import { track } from './track';
 
 interface Tier { min: number; max: number; title: string; text: string; shareText: string }
@@ -66,9 +68,12 @@ document.querySelectorAll<HTMLElement>('[data-experience]').forEach((root) => {
 
   if (kind === 'checklist') {
     const boxes = Array.from(root.querySelectorAll<HTMLInputElement>('[data-exp-item]'));
-    const bar = root.querySelector<HTMLElement>('[data-exp-progress-bar]');
+    const bar = root.querySelector<SVGCircleElement>('[data-exp-progress-bar]');
     const label = root.querySelector<HTMLElement>('[data-exp-progress-label]');
     const progressWrap = root.querySelector<HTMLElement>('[data-exp-progress]');
+    const percentEl = root.querySelector<HTMLElement>('[data-exp-progress-percent]');
+    const GAUGE_CIRCUMFERENCE = 2 * Math.PI * 52; // r=52 در SVG گِیج دونات‌شکل
+    if (bar) bar.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE}`;
 
     try {
       const saved: string[] = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -78,9 +83,10 @@ document.querySelectorAll<HTMLElement>('[data-experience]').forEach((root) => {
     function update(trackChange: boolean) {
       const checked = boxes.filter((b) => b.checked);
       const percent = boxes.length ? Math.round((checked.length / boxes.length) * 100) : 0;
-      if (bar) bar.style.width = percent + '%';
+      if (bar) bar.style.strokeDashoffset = `${GAUGE_CIRCUMFERENCE * (1 - percent / 100)}`;
+      if (percentEl) percentEl.textContent = toFaDigits(percent) + '٪';
       progressWrap?.setAttribute('aria-valuenow', String(percent));
-      if (label) label.textContent = `${toFaDigits(percent)}٪ آماده (${toFaDigits(checked.length)} از ${toFaDigits(boxes.length)} مورد)`;
+      if (label) label.textContent = `${toFaDigits(checked.length)} از ${toFaDigits(boxes.length)} مورد`;
       try { localStorage.setItem(storageKey, JSON.stringify(checked.map((b) => b.value))); } catch { /* ignore */ }
       showResult(findTier(percent), percent, { percent, checked: checked.length, missing: boxes.length - checked.length, total: boxes.length });
       if (trackChange) track('experience_item', { slug, percent });

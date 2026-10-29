@@ -1,8 +1,9 @@
 // کادرهای توضیحی در Markdown ساده:
 //   > [!tip] عنوان کوتاه
 //   > متن کادر
-// انواع: tip، warning، info. خروجی همان <aside class="callout callout-…"> کامپوننت Callout است.
-const TYPES = /^\[!(tip|warning|info)\][ \t]*([^\n]*)\n?([\s\S]*)$/i;
+// انواع: tip، warning، info، key (خلاصهٔ سریع — چند نکتهٔ کلیدی، معمولاً به‌صورت فهرست). خروجی همان
+// <aside class="callout callout-…"> کامپوننت Callout است.
+const TYPES = /^\[!(tip|warning|info|key)\][ \t]*([^\n]*)\n?([\s\S]*)$/i;
 
 function convert(bq) {
   const p = bq.children[0];

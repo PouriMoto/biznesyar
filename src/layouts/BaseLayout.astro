@@ -72,5 +72,16 @@ const clientCfg = JSON.stringify({ analytics: site.analytics, api: { ...site.api
     <script>
       import '../scripts/track';
     </script>
+    <script>
+      // رسم نمودارهای Mermoid فقط وقتی صفحه نمودار دارد؛ کتابخانه از CDN و فقط همین‌جا بارگذاری می‌شود (وزنی به باندل سایت اضافه نمی‌کند).
+      if (document.querySelector('[data-mermaid]')) {
+        import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs')
+          .then(({ default: mermaid }) => {
+            mermaid.initialize({ startOnLoad: false, theme: 'neutral', fontFamily: 'Vazirmatn, sans-serif', securityLevel: 'strict' });
+            return mermaid.run({ querySelector: '[data-mermaid] pre.mermaid' });
+          })
+          .catch(() => { /* بدون اینترنت یا CDN مسدود: کد خام نمودار همچنان خوانا می‌ماند */ });
+      }
+    </script>
   </body>
 </html>

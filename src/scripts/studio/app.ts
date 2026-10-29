@@ -299,7 +299,7 @@ function benchHtml(): string {
   const main = mainKeys.map((k) => byKey(k)).filter(Boolean).map((f: any) => fieldHtml(f, fv(f.key), 'fm')).join('');
   const body = pkg.type === 'region-entry' ? '' : `
 <div class="st-field"><label class="st-label">متن (Markdown)<b class="st-req">*</b></label>
-  <div class="st-tools">${[['## ', 'H2', 'h2'], ['### ', 'H3', 'h3'], ['**', 'B', 'bold'], ['- ', 'لیست', 'ul'], ['1. ', '۱.', 'ol'], ['> ', '❝', 'quote'], ['', '💡 نکته', 'c-tip'], ['', '⚠️ هشدار', 'c-warning'], ['', 'ℹ️ بدانید', 'c-info']].map(([a, l, id]) => `<button type="button" data-act="md" data-v="${id}">${l}</button>`).join('')}
+  <div class="st-tools">${[['## ', 'H2', 'h2'], ['### ', 'H3', 'h3'], ['**', 'B', 'bold'], ['- ', 'لیست', 'ul'], ['1. ', '۱.', 'ol'], ['> ', '❝', 'quote'], ['', '💡 نکته', 'c-tip'], ['', '⚠️ هشدار', 'c-warning'], ['', 'ℹ️ بدانید', 'c-info'], ['', '⚡ خلاصهٔ سریع', 'c-key'], ['', '🧩 نمودار Mermaid', 'mermaid']].map(([a, l, id]) => `<button type="button" data-act="md" data-v="${id}">${l}</button>`).join('')}
   <select data-act="md-link"><option value="">+ پیوند به صفحه سایت</option>${[...kit.lists.services.map((s: any) => [`/services/${s.value}/`, s.label]), ...kit.lists.regions.map((r: any) => [`/areas/${r.value}/`, r.label]), ...kit.articles.filter((a: any) => !a.draft).map((a: any) => [`/articles/${a.slug}/`, a.title]), ...(kit.guides ?? []).filter((a: any) => !a.draft).map((a: any) => [`/guides/${a.slug}/`, a.title]), ['/contact/', 'تماس']].map(([p, l]) => `<option value="${esc(p)}|${esc(l)}">${esc(l)}</option>`).join('')}</select></div>
   ${helpHtml()}
   <textarea class="st-in st-body" rows="16" data-s="body">${esc(pkg.body)}</textarea></div>`;
@@ -692,6 +692,8 @@ function mdInsert(id: string) {
   const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e);
   const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
   const prefix: Record<string, string> = { h2: '## ', h3: '### ', ul: '- ', ol: '1. ', quote: '> ' };
+  if (id === 'c-key') { insertAtCursor(`\n\n> [!key] خلاصهٔ سریع\n> - نکتهٔ کلیدی ۱\n> - نکتهٔ کلیدی ۲\n> - نکتهٔ کلیدی ۳\n\n`); return; }
+  if (id === 'mermaid') { insertAtCursor('\n\n```mermaid\nflowchart TD\n  A[شروع] --> B[پایان]\n```\n\n'); return; }
   if (id.startsWith('c-')) { const t = id.slice(2); const lbl: Record<string, string> = { tip: 'نکته', warning: 'هشدار', info: 'بدانید' }; insertAtCursor(`\n\n> [!${t}] ${lbl[t]}\n> ${sel || 'متن کوتاه کادر'}\n\n`); return; }
   if (id === 'bold') { insertAtCursor(`**${sel || 'متن'}**`); return; }
   ta.value = ta.value.slice(0, lineStart) + prefix[id] + ta.value.slice(lineStart);

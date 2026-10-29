@@ -19,7 +19,14 @@ export interface Experience {
   tiers: ExperienceTier[];
   relatedArticles: string[];
   relatedService?: string;
+  relatedTrades?: string[];
   ctaLabel: string;
+  /** true یعنی نتیجه فقط برای خود کاربر است و نباید اشتراک‌گذاری عمومی پیشنهاد شود (مثلاً آمادگی یا اعتبارسنجی ایده). پیش‌فرض false (مثل کوییز سرگرمی). */
+  private?: boolean;
+  /** دسته‌بندی برای نمایش کنار هم در صفحهٔ اول، مثلاً چهار ابزار «اعتبارسنجی ایده». */
+  group?: 'validation' | string;
+  /** رنگ تمایز کارت در صفحهٔ اول (یکی از توکن‌های theme یا کد رنگ). */
+  accent?: string;
 }
 
 const all = raw as Experience[];

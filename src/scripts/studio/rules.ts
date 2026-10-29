@@ -120,7 +120,7 @@ const fns: Record<string, Fn> = {
     const L = calloutDef().limits ?? {};
     const cs = parseCallouts(pkg.body);
     const out: ReturnType<Fn> = [];
-    if (!cs.length && wordsOf(pkg.body).length >= (L.minWordsForOne ?? 500)) out.push({ id: 'callout-use', field: 'body', msg: 'هیچ کادر نکته/هشدار/بدانید ندارید؛ یک یا دو کادر فهم متن را ساده‌تر می‌کند.' });
+    if (!cs.length && wordsOf(pkg.body).length >= (L.minWordsForOne ?? 500)) out.push({ id: 'callout-use', field: 'body', msg: 'هیچ کادر توضیحی (نکته/هشدار/بدانید/خلاصهٔ سریع) ندارید؛ یک یا دو کادر فهم متن را ساده‌تر می‌کند.' });
     if (cs.length > (L.maxPerPage ?? 4)) out.push({ id: 'callout-use', field: 'body', msg: `${toFa(cs.length)} کادر دارید؛ بیشتر از ${toFa(L.maxPerPage ?? 4)} تا حواس خواننده را پرت می‌کند.` });
     for (const c of cs) {
       if (c.words > (L.maxWords ?? 70)) out.push({ id: 'callout-use', field: 'body', msg: `کادر «${c.title}» ${toFa(c.words)} کلمه است؛ کادر باید کوتاه (حداکثر ${toFa(L.maxWords ?? 70)}) باشد.` });

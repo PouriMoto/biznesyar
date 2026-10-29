@@ -291,10 +291,26 @@ a.row-item:hover .go { translate: -4px 0; }
 .fab-menu .fab-primary { background: var(--primary); color: #fff; justify-content: center; margin-top: .25rem; }
 .fab-menu .fab-primary:hover { background: var(--primary-700); }
 .site-footer { padding-bottom: 3rem !important; }
-.office { display: grid; gap: .3rem; font-size: .95rem; }
+.office { display: grid; gap: .3rem; font-size: .95rem; align-content: start; }
 .office a { text-decoration: none; }
 .office .phones { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; }
 .office .phones a { direction: ltr; font-weight: 700; }
+.office-section { background: color-mix(in oklab, var(--primary) 8%, white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.office-section .office h2 { color: var(--primary-700); }
+.office-map { border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); min-height: 260px; box-shadow: 0 10px 24px rgba(14,107,120,.12); }
+.office-map iframe { width: 100%; height: 100%; min-height: 260px; border: 0; display: block; }
+
+/* ۴ کارت ابزار اعتبارسنجی ایده */
+.validation-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 1.5rem; }
+.validation-card { --v-accent: var(--primary); display: grid; gap: .4rem; padding: 1.4rem 1.3rem; border-radius: calc(var(--radius) + 4px); text-decoration: none; color: inherit; background: linear-gradient(165deg, color-mix(in oklab, var(--v-accent) 14%, white), #fff 60%); border: 1.5px solid color-mix(in oklab, var(--v-accent) 35%, var(--line)); position: relative; overflow: hidden; transition: transform .15s, box-shadow .15s; }
+.validation-card::before { content: ''; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 5px; background: var(--v-accent); }
+.validation-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,.1); }
+.validation-card .ico { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 50%; background: var(--v-accent); color: #fff; }
+.validation-card .ico .icon { width: 1.4em; height: 1.4em; }
+.validation-card h3 { margin: .3rem 0 0; font-size: 1.05rem; }
+.validation-card p { margin: 0; color: var(--muted); font-size: .92rem; }
+.validation-card .go { display: inline-flex; align-items: center; gap: .3rem; margin-top: .4rem; font-weight: 700; color: var(--v-accent); }
+.validation-card .go .icon { width: 1em; height: 1em; }
 
 /* mdx components */
 .callout { margin: 1.4em 0; padding: .9rem 1.1rem; border-radius: var(--radius); border: 1px solid var(--line); border-inline-start-width: 4px; display: grid; gap: .2rem; font-size: .98rem; }
@@ -302,6 +318,25 @@ a.row-item:hover .go { translate: -4px 0; }
 .callout-info { background: var(--primary-50); border-inline-start-color: var(--primary); }
 .callout-warning { background: color-mix(in oklab, var(--accent) 12%, white); border-inline-start-color: var(--accent); }
 .callout-tip { background: #effaf2; border-inline-start-color: #2e9e57; }
+.callout-key { background: #fff8e6; border-inline-start-color: #c9860f; border-width: 1.5px; }
+.callout-key strong { display: flex; align-items: center; gap: .4rem; font-size: 1rem; }
+.callout-key strong::before { content: '⚡'; }
+.callout-key ul { margin: .2rem 0 0; padding-inline-start: 1.3rem; display: grid; gap: .35rem; }
+.callout-key li { font-weight: 600; }
+
+/* نمودار Mermaid */
+.mermaid-diagram { margin: 1.4em 0; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; overflow-x: auto; }
+.mermaid-diagram pre.mermaid { font-family: inherit; white-space: pre; margin: 0; }
+.mermaid-diagram figcaption { margin-top: .6rem; font-size: .88rem; color: var(--muted); text-align: center; }
+
+/* ابزارهای مرتبط زیر مقالات/راهنماها */
+.tools-related { margin-top: 3rem; }
+.tools-related-grid { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.tool-mini-card { --tool-accent: var(--primary); display: flex; align-items: flex-start; gap: .7rem; padding: 1rem; border: 1.5px solid var(--line); border-inline-start: 4px solid var(--tool-accent); border-radius: var(--radius); background: #fff; text-decoration: none; color: inherit; transition: box-shadow .15s, transform .15s; }
+.tool-mini-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.08); transform: translateY(-1px); }
+.tool-mini-card .ico { flex: none; width: 2.2rem; height: 2.2rem; display: grid; place-items: center; border-radius: 50%; background: color-mix(in oklab, var(--tool-accent) 16%, white); color: var(--tool-accent); }
+.tool-mini-card strong { display: block; font-size: .96rem; }
+.tool-mini-card small { color: var(--muted); }
 .figure { margin: 1.6em 0; }
 .figure img, .figure video { width: 100%; height: auto; border-radius: var(--radius); background: var(--soft); }
 .figure figcaption { margin-top: .5rem; font-size: .88rem; color: var(--muted); text-align: center; }
@@ -417,9 +452,16 @@ dialog#help-dlg::backdrop { background: rgb(15 31 46 / .55); }
 
 /* ابزارها و تست‌های تعاملی (src/pages/tools/) */
 .exp { display: grid; gap: 1.2rem; }
-.exp-progress { height: .6rem; border-radius: 99px; background: var(--soft); overflow: hidden; }
-.exp-progress-bar { height: 100%; width: 0; background: var(--primary); transition: width .25s ease; border-radius: inherit; }
-.exp-progress-label { margin: 0; font-weight: 700; color: var(--primary-700); }
+.exp-private-note { display: flex; align-items: center; gap: .5rem; margin: 0; padding: .7rem 1rem; border-radius: var(--radius); background: var(--soft); color: var(--muted); font-size: .9rem; }
+.exp-private-note .icon { flex: none; color: var(--primary); }
+.exp-gauge { display: grid; justify-items: center; justify-self: center; position: relative; width: 150px; height: 150px; }
+.exp-gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.exp-gauge-track { fill: none; stroke: var(--soft); stroke-width: 12; }
+.exp-gauge-bar { fill: none; stroke: var(--primary); stroke-width: 12; stroke-linecap: round; stroke-dashoffset: 326.7; transition: stroke-dashoffset .35s ease; }
+.exp-gauge-center { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: .1rem; text-align: center; }
+.exp-gauge-center strong { font-size: 1.7rem; color: var(--primary-700); line-height: 1; }
+.exp-gauge-center span { font-size: .8rem; color: var(--muted); }
+.exp-progress-label { margin: 0; font-weight: 700; color: var(--primary-700); text-align: center; }
 .exp-score { margin: 0; font-weight: 700; color: var(--primary-700); }
 .exp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
 .exp-check label { display: flex; align-items: flex-start; gap: .7rem; padding: .9rem 1rem; border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; background: #fff; }

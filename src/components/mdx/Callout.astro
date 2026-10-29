@@ -1,8 +1,10 @@
 ---
-interface Props { variant?: 'info' | 'warning' | 'tip'; title?: string }
+// variant «key»: خلاصهٔ سریع — ۳ تا ۴ نکتهٔ کلیدی نزدیک ابتدای مقاله، برای کسی که وقت خواندن کل متن را ندارد.
+interface Props { variant?: 'info' | 'warning' | 'tip' | 'key'; title?: string }
 const { variant = 'info', title } = Astro.props;
+const defaultTitle = variant === 'key' ? 'خلاصهٔ سریع' : undefined;
 ---
 <aside class={`callout callout-${variant}`} role="note">
-  {title && <strong>{title}</strong>}
+  {(title || defaultTitle) && <strong>{title || defaultTitle}</strong>}
   <div><slot /></div>
 </aside>
