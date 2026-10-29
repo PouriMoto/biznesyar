@@ -4,6 +4,7 @@ description: تفاوت جواز کسب اینترنتی و جواز کسب صن
 category: جواز کسب، پروانه کسب، کسب‌وکار اینترنتی
 tags: [جواز کسب اینترنتی, جواز کسب صنفی, مجوز کسب‌وکار مجازی, اینماد, تفاوت جواز کسب]
 service: business-license
+trade: general
 region: iran
 publishedAt: 2026-10-30
 updatedAt: 2026-10-30

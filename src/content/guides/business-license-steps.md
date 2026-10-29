@@ -4,6 +4,7 @@ description: راهنمای کامل مراحل دریافت جواز کسب د�
 category: جواز کسب، پروانه کسب، مراحل دریافت
 tags: [مراحل دریافت جواز کسب, پروانه کسب, درگاه ملی مجوزها, مدارک جواز کسب, هزینه جواز کسب]
 service: business-license
+trade: general
 region: iran
 publishedAt: 2026-10-30
 updatedAt: 2026-10-30
