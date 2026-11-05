@@ -3,9 +3,10 @@ import Icon from './Icon.astro';
 import { channels } from '../lib/links';
 import { enabledServices, getRegions } from '../lib/content';
 import { leadsOn, isStatic } from '../lib/leads';
+import { trades } from '../lib/trades';
 
-interface Props { id?: string; heading?: string; sub?: string; service?: string; region?: string; compact?: boolean; formName?: string; placement?: 'hero' | 'service' | 'area' | 'article' | 'contact' }
-const { id = 'lead', heading = 'مشاوره رایگان', sub = 'شماره‌تان را بگذارید تا با شما تماس بگیریم.', service = '', region = '', compact = false, formName = 'lead', placement = 'contact' } = Astro.props;
+interface Props { id?: string; heading?: string; sub?: string; service?: string; region?: string; trade?: string; compact?: boolean; formName?: string; placement?: 'hero' | 'service' | 'area' | 'article' | 'contact' }
+const { id = 'lead', heading = 'مشاوره رایگان', sub = 'شماره‌تان را بگذارید تا با شما تماس بگیریم.', service = '', region = '', trade = '', compact = false, formName = 'lead', placement = 'contact' } = Astro.props;
 const services = enabledServices();
 const regions = getRegions();
 const ch = channels();
@@ -44,6 +45,12 @@ const on = leadsOn(placement);
         </label>
       )}
     </div>
+    <label>رستهٔ شغلی یا نوع کسب‌وکار
+      <input name="trade" list={`${id}-trades`} required minlength="2" placeholder="مثلاً آرایشگاه زنانه، کافه، تعمیرگاه…" value={trade} data-lead-trade autocomplete="off" />
+      <datalist id={`${id}-trades`}>
+        {trades.map((t) => <option value={t.name} />)}
+      </datalist>
+    </label>
     {!compact && <label>توضیح کوتاه (اختیاری)<textarea name="message" rows="2" maxlength="1000"></textarea></label>}
     <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <button class="btn btn-primary" type="submit">درخواست تماس رایگان</button>

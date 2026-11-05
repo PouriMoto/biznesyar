@@ -74,6 +74,7 @@
     "quiz": false
   },
   "analytics": {
+    "ga4": "",
     "metrica": "",
     "sink": "none"
   },
@@ -120,7 +121,8 @@
         "message": "entry.0000000005",
         "page": "entry.0000000006",
         "source": "entry.0000000007",
-        "utm": "entry.0000000008"
+        "utm": "entry.0000000008",
+        "trade": "entry.0000000009"
       }
     },
     "placements": {

@@ -1,0 +1,98 @@
+---
+// دایرکتوری سئوی مفهومی: به‌جای ساختن صفحهٔ جدا برای هر «رسته در هر شهر» (که تولید انبوه کم‌کیفیت می‌شود)،
+// همین یک کامپوننت در هر صفحهٔ شهر به راهنماهای ملی/خدمات/رسته‌ها لینک می‌دهد. قابل جست‌وجو، دسته‌بندی‌شده و سبک «شیشه‌ای».
+import Icon from './Icon.astro';
+import { tradesByGroup } from '../lib/trades';
+import { guideHref } from '../lib/content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  region: { slug: string; name: string };
+  services: { slug: string; title: string; icon: string; short: string }[];
+  guides: CollectionEntry<'guides'>[];
+  articles: CollectionEntry<'articles'>[];
+}
+const { region, services, guides, articles } = Astro.props;
+const primaryService = services[0]?.slug ?? '';
+const groups = tradesByGroup();
+const groupColors = ['#0E6B78', '#2D6CDF', '#E0A100', '#D24D57', '#6B46C1', '#2E9E57', '#B45309'];
+---
+<section class="city-dir" aria-label={`راهنمای خدمات و رسته‌ها در ${region.name}`}>
+  <div class="city-dir-head">
+    <h2>راهنمای کامل خدمات و رسته‌ها در {region.name}</h2>
+    <p>به‌جای یک صفحهٔ جدا برای هر رسته، همین‌جا به راهنمای درست وصل می‌شوید؛ برای هر رسته‌ای که مطمئن نیستید، فرم مشاوره پایین صفحه را پر کنید.</p>
+  </div>
+
+  <div class="city-dir-search">
+    <Icon name="search" />
+    <input type="search" placeholder="جست‌وجوی خدمت یا رسته…" data-dir-search aria-label="جست‌وجو در راهنما" />
+  </div>
+
+  <div class="city-dir-body" data-dir-body>
+    <div class="dir-col">
+      <h3>خدمات ما</h3>
+      <div class="dir-chips">
+        {services.map((s) => (
+          <a class="dir-chip dir-chip-service" href={`/services/${s.slug}/`} data-dir-item data-dir-text={s.title}>
+            <Icon name={s.icon} /> {s.title}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    {groups.map(({ group, items }, gi) => (
+      <div class="dir-col" style={`--g-accent:${groupColors[gi % groupColors.length]}`}>
+        <h3>{group}</h3>
+        <div class="dir-chips">
+          {items.map((t) => {
+            const href = (primaryService && guideHref(guides, t.slug, primaryService, region.slug)) || `/services/${primaryService}/?trade=${encodeURIComponent(t.name)}#lead`;
+            return (
+              <a class="dir-chip" href={href} data-dir-item data-dir-text={t.name}>
+                {t.name}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    ))}
+
+    {articles.length > 0 && (
+      <div class="dir-col dir-col-wide">
+        <h3>راهنماها و مقالات عمومی</h3>
+        <div class="dir-chips">
+          {articles.map((a) => (
+            <a class="dir-chip dir-chip-article" href={`/articles/${a.id}/`} data-dir-item data-dir-text={a.data.title}>
+              <Icon name="file-text" /> {a.data.title}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+
+  <p class="dir-empty" data-dir-empty hidden>چیزی با این عبارت پیدا نشد؛ برایش هم می‌توانید مستقیم از فرم پایین صفحه بپرسید.</p>
+</section>
+
+<script>
+  const root = document.querySelector('[data-dir-body]');
+  const input = document.querySelector<HTMLInputElement>('[data-dir-search]');
+  const empty = document.querySelector<HTMLElement>('[data-dir-empty]');
+  if (root && input) {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-dir-item]'));
+    const cols = Array.from(root.querySelectorAll<HTMLElement>('.dir-col'));
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      let visible = 0;
+      items.forEach((el) => {
+        const match = !q || (el.dataset.dirText || '').includes(q);
+        el.hidden = !match;
+        if (match) visible++;
+      });
+      cols.forEach((col) => {
+        const anyVisible = Array.from(col.querySelectorAll<HTMLElement>('[data-dir-item]')).some((el) => !el.hidden);
+        col.hidden = !anyVisible;
+      });
+      if (empty) empty.hidden = visible > 0;
+    });
+  }
+</script>

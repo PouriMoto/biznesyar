@@ -9,7 +9,8 @@ import { getEntry, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Callout from '../../components/mdx/Callout.astro';
 import Figure from '../../components/mdx/Figure.astro';
-import { enabledServices, getRegions, getArticles } from '../../lib/content';
+import { enabledServices, getRegions, getArticles, getGuides } from '../../lib/content';
+import CityDirectory from '../../components/CityDirectory.astro';
 import { breadcrumbSchema, faqSchema, abs } from '../../lib/seo';
 import { formatDate } from '../../lib/format';
 import { leadsOn } from '../../lib/leads';
@@ -23,7 +24,10 @@ const services = enabledServices();
 const entry = await getEntry('areas', r.slug);
 const Body = entry ? (await render(entry)).Content : null;
 const faqItems = [...r.faq, ...(entry?.data.faq ?? [])];
-const arts = (await getArticles()).filter((a) => a.data.region === r.slug).slice(0, 4);
+const allArts = await getArticles();
+const arts = allArts.filter((a) => a.data.region === r.slug).slice(0, 4);
+const generalArts = allArts.filter((a) => !a.data.region).slice(0, 8);
+const guides = await getGuides();
 const path = `/areas/${r.slug}/`;
 const title = `خدمات کسب‌وکار و جواز کسب در ${r.name}`;
 const desc = `${site.brand.name_fa}؛ مشاوره و پیگیری جواز کسب و امور اداری کسب‌وکار در ${r.name}. مشاوره اولیه رایگان.`;
@@ -46,24 +50,15 @@ const local = {
         <figure class="cover"><Image src={entry.data.cover.src} alt={entry.data.cover.alt} widths={[480, 800, 1200]} sizes="(min-width: 900px) 40rem, 100vw" loading="eager" />{entry.data.cover.caption && <figcaption class="meta" style="justify-content:center;margin-top:.5rem">{entry.data.cover.caption}</figcaption>}</figure>
       )}
       {Body && <div class="prose block"><Body components={{ Callout, Figure }} /></div>}
-      <section class="block">
-        <h2>خدمات در {r.name}</h2>
-        <div class="rows">
-          {services.map((s) => (
-            <a class="row-item" href={`/services/${s.slug}/`}>
-              <span class="ico"><Icon name={s.icon} /></span>
-              <span><h3>{s.title}</h3><p>{s.short}</p></span>
-              <Icon name="arrow-left" class="go" />
-            </a>
-          ))}
-        </div>
-      </section>
       {r.notes.length > 0 && (
         <section class="block">
           <h2>نکات مهم برای {r.name}</h2>
           <ul class="check">{r.notes.map((n: string) => <li><Icon name="check" /><span>{n}</span></li>)}</ul>
         </section>
       )}
+
+      <div class="block"><CityDirectory region={r} services={services} guides={guides} articles={generalArts} /></div>
+
       {leadsOn('magnet') && <LeadMagnet service="business-license" />}
       <div class="block"><Faq items={faqItems} /></div>
       {arts.length > 0 && (

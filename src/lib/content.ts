@@ -28,6 +28,15 @@ export const allServices = (): Service[] =>
 export const enabledServices = () => allServices().filter((s) => s.enabled);
 export const getRegions = () => regions;
 
+// مسیر راهنمای ملی رسته×خدمت (یا نسخهٔ همان منطقه اگر برای منطقهٔ آزاد وجود داشته باشد).
+// این همان راهی است که دایرکتوری شهرها بدون ساختن صفحهٔ جدا برای هر شهر، به محتوای درست لینک می‌دهد.
+export function guideHref(guides: CollectionEntry<'guides'>[], trade: string, service: string, regionSlug?: string): string | null {
+  const local = regionSlug && guides.find((g) => g.data.trade === trade && g.data.service === service && g.data.region === regionSlug);
+  const national = guides.find((g) => g.data.trade === trade && g.data.service === service && !g.data.region);
+  const g = local || national;
+  return g ? `/guides/${g.id}/` : null;
+}
+
 export function related(all: CollectionEntry<'articles'>[], self: CollectionEntry<'articles'>, n = 3) {
   const score = (e: CollectionEntry<'articles'>) =>
     (e.data.service && e.data.service === self.data.service ? 2 : 0) +

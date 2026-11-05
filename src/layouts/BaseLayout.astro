@@ -58,6 +58,19 @@ const clientCfg = JSON.stringify({ analytics: site.analytics, api: { ...site.api
     <Footer />
     <ContactFab leadHref={leadHref} />
     <script type="application/json" id="bz-config" set:html={clientCfg} />
+    {site.analytics.ga4 && (
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}`}></script>
+    )}
+    {site.analytics.ga4 && (
+      <script is:inline define:vars={{ id: site.analytics.ga4 }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        // page_view را خودِ gtag با همین پیکربندی می‌فرستد؛ بقیهٔ رویدادها (کلیک، فرم، تست‌ها...) را track.ts جداگانه می‌فرستد.
+        gtag('config', id, { send_page_view: true });
+      </script>
+    )}
     {site.analytics.metrica && (
       <script is:inline define:vars={{ id: Number(site.analytics.metrica) }}>
         window.ym = window.ym || function () { (window.ym.a = window.ym.a || []).push(arguments); };

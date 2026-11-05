@@ -1,6 +1,6 @@
 // ارسال لید: حالت static ← گوگل‌فرم | حالت backend ← PocketBase
 const cfg = JSON.parse(document.getElementById('bz-config')?.textContent || '{}');
-export interface Lead { name: string; phone: string; service: string; region: string; message: string; page: string; source: string; utm: string }
+export interface Lead { name: string; phone: string; trade: string; service: string; region: string; message: string; page: string; source: string; utm: string }
 
 const PENDING = 'bz_pending_leads';
 const configured = (a?: string) => !!a && !/FORM_ID_HERE/.test(a);

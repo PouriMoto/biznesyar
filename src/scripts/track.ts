@@ -23,6 +23,8 @@ export function track(name: string, payload: Payload = {}) {
   (w.bzEvents ||= []).push(ev);
   window.dispatchEvent(new CustomEvent('bz:event', { detail: ev }));
   if (cfg.analytics?.metrica && typeof w.ym === 'function') w.ym(cfg.analytics.metrica, 'reachGoal', name, payload);
+  // page_view را خودِ gtag با config اولیه می‌فرستد؛ اینجا فقط بقیهٔ رویدادها (کلیک، فرم، تست‌ها...) را به GA4 می‌فرستیم تا دوبار شمارش نشود.
+  if (cfg.analytics?.ga4 && name !== 'page_view' && typeof w.gtag === 'function') w.gtag('event', name, payload);
   if (cfg.analytics?.sink === 'pocketbase' && cfg.api?.events) {
     try {
       const body = new Blob([JSON.stringify({ name, sid, path: location.pathname, payload: JSON.stringify(payload) })], { type: 'application/json' });

@@ -13,7 +13,7 @@ document.querySelectorAll<HTMLElement>('section.magnet').forEach((box) => {
     if (!/^09\d{9}$/.test(phone)) { status.hidden = false; status.textContent = 'شماره موبایل را به شکل 09123456789 وارد کنید.'; return; }
     const btn = form.querySelector('button')!; btn.disabled = true;
     try {
-      await sendLead({ name: 'دانلود PDF', phone, service: box.dataset.service || '', region: '', message: 'دانلود: ' + box.querySelector('h3')!.textContent, page: location.pathname, source: 'magnet:' + box.dataset.magnet, utm: '{}' });
+      await sendLead({ name: 'دانلود PDF', phone, trade: '', service: box.dataset.service || '', region: '', message: 'دانلود: ' + box.querySelector('h3')!.textContent, page: location.pathname, source: 'magnet:' + box.dataset.magnet, utm: '{}' });
       track('magnet_submit', { id: box.dataset.magnet });
       form.hidden = true; done.hidden = false;
     } catch { status.hidden = false; status.textContent = 'ارسال انجام نشد. دوباره تلاش کنید.'; btn.disabled = false; }

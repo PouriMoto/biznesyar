@@ -329,6 +329,27 @@ a.row-item:hover .go { translate: -4px 0; }
 .mermaid-diagram pre.mermaid { font-family: inherit; white-space: pre; margin: 0; }
 .mermaid-diagram figcaption { margin-top: .6rem; font-size: .88rem; color: var(--muted); text-align: center; }
 
+/* دایرکتوری سئوی شهرها: خدمات + رسته‌ها (گروه‌بندی‌شده) + مقالات عمومی، به‌جای صفحهٔ جدا برای هر رسته در هر شهر */
+.city-dir { margin-top: 2.4rem; padding: clamp(1.3rem, 4vw, 2rem); border-radius: calc(var(--radius) + 8px); background: linear-gradient(160deg, color-mix(in oklab, var(--primary) 7%, #fff), color-mix(in oklab, var(--accent, #E0A100) 5%, #fff)); border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--line)); }
+.city-dir-head h2 { margin: 0 0 .3rem; font-size: 1.25rem; }
+.city-dir-head p { margin: 0 0 1.1rem; color: var(--muted); font-size: .92rem; }
+.city-dir-search { display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem; border-radius: 99px; background: rgba(255,255,255,.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 6px 18px rgba(15,31,46,.06); margin-bottom: 1.3rem; }
+.city-dir-search .icon { color: var(--muted); flex: none; }
+.city-dir-search input { flex: 1; border: 0; background: transparent; font: inherit; outline: none; }
+.city-dir-body { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.dir-col-wide { grid-column: 1 / -1; }
+.dir-col h3 { margin: 0 0 .6rem; font-size: .95rem; color: var(--muted); font-weight: 700; }
+.dir-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.dir-chip { --g-accent: var(--primary); display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem; border-radius: 99px; background: rgba(255,255,255,.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid color-mix(in oklab, var(--g-accent) 38%, rgba(255,255,255,.6)); color: color-mix(in oklab, var(--g-accent) 70%, #1a1a1a); font-size: .85rem; font-weight: 600; text-decoration: none; transition: transform .12s, box-shadow .12s, background .12s; }
+.dir-chip:hover { transform: translateY(-1px); background: rgba(255,255,255,.85); box-shadow: 0 6px 16px rgba(15,31,46,.1); }
+.dir-chip .icon { width: 1em; height: 1em; }
+.dir-chip-service { --g-accent: var(--primary); }
+.dir-chip-article { --g-accent: #6B46C1; }
+.dir-empty { margin-top: 1rem; color: var(--muted); font-size: .9rem; }
+@media (prefers-reduced-transparency: reduce) {
+  .city-dir-search, .dir-chip { backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; }
+}
+
 /* ابزارهای مرتبط زیر مقالات/راهنماها */
 .tools-related { margin-top: 3rem; }
 .tools-related-grid { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
@@ -451,6 +472,12 @@ dialog#help-dlg::backdrop { background: rgb(15 31 46 / .55); }
 @media (min-width: 880px) { .header-actions { margin-inline-start: 0; } }
 
 /* ابزارها و تست‌های تعاملی (src/pages/tools/) */
+/* فاصلهٔ عمودی بین بخش‌های صفحهٔ ابزار (یادداشت/تست/مطالعهٔ بیشتر/فرم لید/پرسش‌ها) تا به‌هم نچسبند */
+.tool-block { margin-top: clamp(2.2rem, 5vw, 3.2rem); }
+.tool-block-first { margin-top: clamp(1.6rem, 4vw, 2.4rem); }
+.tool-block-last { margin-bottom: clamp(2.2rem, 5vw, 3.2rem); }
+.exp-card { background: #fff; border: 1.5px solid var(--line); border-radius: calc(var(--radius) + 6px); padding: clamp(1.3rem, 4vw, 2rem); box-shadow: 0 10px 28px rgba(15, 31, 46, .06); }
+
 .exp { display: grid; gap: 1.2rem; }
 .exp-private-note { display: flex; align-items: center; gap: .5rem; margin: 0; padding: .7rem 1rem; border-radius: var(--radius); background: var(--soft); color: var(--muted); font-size: .9rem; }
 .exp-private-note .icon { flex: none; color: var(--primary); }
