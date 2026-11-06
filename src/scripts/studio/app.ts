@@ -6,10 +6,15 @@ import { localFactCount, guideFactCount, getBriefForm, buildPrompt, buildStaged,
 import { makeZip } from './zip';
 import { pagesPanel, applyInput as pgInput, addItem as pgAdd, delItem as pgDel, pagesJson } from './pages';
 import { toCoverWebp, fetchImage } from './image';
+import { expPanel, expRestore, expOpenFolder, expSaveFolder, expDownloadBlob, expAdd, expDelete, expToggle, expSetMode, expSetField, expApplyRaw, expPrompt } from './experiences';
+import { srvPanel, srvRestore, srvOpenFolder, srvSaveFolder, srvServicesBlob, srvConfigBlob, srvAdd, srvDelete, srvToggleOpen, srvToggleEnabled, srvSetField } from './services';
 
-type Tab = 'agent' | 'copy' | 'manual' | 'cities' | 'pages';
+type Tab = 'guide' | 'article' | 'area' | 'trades' | 'services' | 'pages';
+type Method = 'agent' | 'copy' | 'manual';
 interface State {
   tab: Tab;
+  method: Method;
+  areaWrite: string | null; // وقتی «متن بلند» یک شهر (یا دسته‌ای) در حال نوشتن است
   ctype: 'article' | 'area-page' | 'guide';
   inputs: Record<string, Record<string, any>>;
   pkg: Pkg | null;
@@ -23,7 +28,7 @@ interface State {
   pages: any;
 }
 const KEY = 'studio.v1';
-const S: State = { tab: 'agent', ctype: 'article', inputs: { article: { length: 'medium' }, 'area-page': { style: 'local' }, guide: { length: 'medium', style: 'license-guide' } }, pkg: null, reply: '', stage: { r1: '', r2: '' }, mode: 'full', prompt: '', batch: [], batchTrades: [], ui: {}, pages: null };
+const S: State = { tab: 'guide', method: 'agent', areaWrite: null, ctype: 'guide', inputs: { article: { length: 'medium' }, 'area-page': { style: 'local' }, guide: { length: 'medium', style: 'license-guide' } }, pkg: null, reply: '', stage: { r1: '', r2: '' }, mode: 'full', prompt: '', batch: [], batchTrades: [], ui: {}, pages: null };
 let issues: Issue[] = [];
 let coverObj = '';
 let validateTimer: number | undefined;
@@ -38,7 +43,7 @@ function save() {
   saveTimer = window.setTimeout(async () => {
     try {
       const pkg = S.pkg ? { ...S.pkg, cover: S.pkg.cover ? { url: S.pkg.cover.url, data: S.pkg.cover.blob ? await blobToData(S.pkg.cover.blob) : undefined } : undefined } : null;
-      localStorage.setItem(KEY, JSON.stringify({ tab: S.tab, ctype: S.ctype, inputs: S.inputs, pkg, reply: S.reply, stage: S.stage, mode: S.mode }));
+      localStorage.setItem(KEY, JSON.stringify({ tab: S.tab, method: S.method, areaWrite: S.areaWrite, ctype: S.ctype, inputs: S.inputs, pkg, reply: S.reply, stage: S.stage, mode: S.mode }));
     } catch { /* پر بودن حافظه یا حالت خصوصی */ }
   }, 400);
 }
@@ -47,7 +52,7 @@ async function restore() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return;
     const j = JSON.parse(raw);
-    Object.assign(S, { tab: j.tab ?? 'agent', ctype: j.ctype ?? 'article', inputs: { ...S.inputs, ...(j.inputs ?? {}) }, reply: j.reply ?? '', stage: j.stage ?? S.stage, mode: j.mode ?? 'full' });
+    Object.assign(S, { tab: j.tab ?? 'guide', method: j.method ?? 'agent', areaWrite: j.areaWrite ?? null, ctype: j.ctype ?? 'guide', inputs: { ...S.inputs, ...(j.inputs ?? {}) }, reply: j.reply ?? '', stage: j.stage ?? S.stage, mode: j.mode ?? 'full' });
     if (j.pkg && kit.contract.types[j.pkg.type]) {
       const c = j.pkg.cover;
       S.pkg = { ...j.pkg, cover: c ? { url: c.url, blob: c.data ? await (await fetch(c.data)).blob() : undefined } : undefined };
@@ -116,9 +121,20 @@ function inputForm(type: 'article' | 'area-page' | 'guide'): string {
 }
 
 const typeSwitch = () => `<div class="st-seg" role="tablist">${(['article', 'guide', 'area-page'] as const).map((t) => `<button class="${S.ctype === t ? 'on' : ''}" data-act="ctype" data-v="${t}">${esc(typeDef(t).label)}</button>`).join('')}</div>`;
+const METHODS: [Method, string][] = [['agent', 'با Agent'], ['copy', 'Copy-for-AI'], ['manual', 'دستی']];
+const methodSwitch = () => `<div class="st-seg" role="tablist">${METHODS.map(([m, l]) => `<button class="${S.method === m ? 'on' : ''}" data-act="method" data-v="${m}">${l}</button>`).join('')}</div>`;
+// پنل محتوا برای تب‌های «راهنماها»/«مقالات» (و زیرحالت نوشتن متن بلند منطقه): نوع ثابت است، فقط روش عوض می‌شود
+function contentPanel(lockedType: 'guide' | 'article' | 'area-page'): string {
+  const body = S.method === 'agent' ? panelAgent(lockedType) : S.method === 'copy' ? panelCopy(lockedType) : panelManual(lockedType);
+  return `${methodSwitch()}${body}`;
+}
+function areaWritePanel(): string {
+  return `<div class="st-actions"><button class="btn btn-ghost" data-act="area-back">← بازگشت به فهرست شهرها</button></div>${contentPanel('area-page')}`;
+}
 
 // ───────── پنل‌های تب ─────────
-function panelAgent(): string {
+function panelAgent(lockedType?: 'guide' | 'article' | 'area-page'): string {
+  if (lockedType) S.ctype = lockedType;
   const f = getBriefForm();
   const ok = !!(f.action && f.fields?.job);
   const showBatch = (S.ctype === 'article' && (S.inputs.article.style === 'local' || S.batch.length > 0)) || S.ctype === 'area-page' || S.ctype === 'guide';
@@ -131,7 +147,7 @@ function panelAgent(): string {
   <p>بریف را بنویسید و بفرستید؛ Agent مطلب را به‌صورت <b>پیش‌نویس</b> می‌سازد و شما بازبینی و منتشر می‌کنید.</p>
   ${ok ? '<div class="st-conn-ok">✓ صف Agent متصل است؛ ارسال مستقیم فعال است.</div>' : '<div class="st-conn-need">هنوز صف Agent وصل نشده. از ستون/بخش «اتصال Agent» یک‌بار وصلش کنید؛ تا آن موقع «کپی کار» یا Copy-for-AI را بزنید.</div>'}
 </div>
-${typeSwitch()}
+${lockedType ? '' : typeSwitch()}
 ${inputForm(S.ctype)}
 ${showBatch ? `<details class="st-card st-more" ${S.batch.length || S.batchTrades.length ? 'open' : ''}><summary>ساخت دسته‌ای ${S.ctype === 'guide' ? '(ماتریس رسته × شهر)' : 'برای چند شهر'}</summary>
   <p class="st-help">${S.ctype === 'guide' ? 'چند رسته و/یا چند شهر انتخاب کنید؛ برای هر ترکیب یک راهنمای جدا ساخته می‌شود. بدون انتخاب شهر، راهنمای کشوری ساخته می‌شود. ترکیبی که داده کافی ندارد رد می‌شود.' : 'برای هر شهر، یک نوشته جدا با داده همان شهر ساخته می‌شود. شهری که داده محلی کافی ندارد رد می‌شود.'}</p>
@@ -205,14 +221,15 @@ function connectHtml(ok: boolean): string {
 </details>`;
 }
 
-function panelCopy(): string {
+function panelCopy(lockedType?: 'guide' | 'article' | 'area-page'): string {
+  if (lockedType) S.ctype = lockedType;
   const staged = S.mode === 'staged';
   return `
 <div class="st-intro">
   <h2>Copy-for-AI</h2>
   <p>فرم را پر کنید، پرامپت آماده را در هر چت هوش مصنوعی بچسبانید و پاسخ را برگردانید. نیازی به Agent یا API نیست.</p>
 </div>
-${typeSwitch()}
+${lockedType ? '' : typeSwitch()}
 ${inputForm(S.ctype)}
 <div class="st-card">
   <div class="st-field"><label class="st-label">حالت پرامپت</label>
@@ -220,8 +237,9 @@ ${inputForm(S.ctype)}
   <button class="btn btn-primary" data-act="make-prompt">ساخت پرامپت</button>
 </div>
 <div id="st-prompt">${S.prompt ? promptHtml() : ''}</div>
+${(() => { const st = loadSettings(); return st.apiKey && st.model ? `<div class="st-actions"><button class="btn btn-primary" data-act="ai-generate" ${S.prompt && S.prompt !== 'staged' ? '' : 'disabled title="اول ساخت پرامپت را بزنید"'}>تولید خودکار با API (به‌جای کپی‌پیست دستی)</button></div>` : `<p class="st-help">اگر در تنظیمات (⚙) کلید API و مدل را وارد کنید، این مرحله هم می‌تواند خودکار انجام شود.</p>`; })()}
 <div class="st-card">
-  <h3>۲. پاسخ هوش مصنوعی را اینجا بچسبانید</h3>
+  <h3>۲. پاسخ هوش مصنوعی را اینجا بچسبانید (یا با دکمهٔ بالا خودکار پر کنید)</h3>
   <textarea class="st-in ltr-text" rows="8" data-act="reply" placeholder="&lt;&lt;&lt;PACKAGE ... &gt;&gt;&gt;">${esc(S.reply)}</textarea>
   <div class="st-actions"><button class="btn btn-primary" data-act="load-reply">ساخت بسته از پاسخ</button></div>
   <div id="st-reply-msg" class="st-msg"></div>
@@ -250,31 +268,37 @@ function existingItems() {
   ];
 }
 
-function panelManual(): string {
-  const items = existingItems();
+const NEW_BTN: Record<string, [string, string]> = {
+  article: ['مقاله جدید', 'article'],
+  guide: ['راهنمای رسته × مجوز', 'guide'],
+  'area-page': ['متن بلند صفحه منطقه', 'area-page']
+};
+function panelManual(lockedType?: 'guide' | 'article' | 'area-page'): string {
+  const items = lockedType ? existingItems().filter((i) => i.t === lockedType) : existingItems();
+  const newButtons = lockedType
+    ? `<button class="btn btn-primary" data-act="new" data-v="${lockedType}">${NEW_BTN[lockedType][0]}</button>`
+    : `<button class="btn btn-primary" data-act="new" data-v="article">مقاله جدید</button>
+  <button class="btn btn-ghost" data-act="new" data-v="guide">راهنمای رسته × مجوز</button>
+  <button class="btn btn-ghost" data-act="new" data-v="area-page">متن بلند صفحه منطقه</button>`;
   return `
 <div class="st-intro"><h2>نوشتن یا وارد کردن دستی</h2><p>بدون هوش مصنوعی: مطلب بنویسید، متن آماده‌تان را بچسبانید یا مطلب موجود را باز کنید و ویرایش کنید.</p></div>
-<div class="st-actions">
-  <button class="btn btn-primary" data-act="new" data-v="article">مقاله جدید</button>
-  <button class="btn btn-ghost" data-act="new" data-v="guide">راهنمای رسته × مجوز</button>
-  <button class="btn btn-ghost" data-act="new" data-v="area-page">متن بلند صفحه منطقه</button>
-</div>
+<div class="st-actions">${newButtons}</div>
 <details class="st-card st-more" data-ui="existing" ${S.ui.existing ? 'open' : ''}><summary>ویرایش مطلب موجود (${toFa(items.length)} مورد)</summary>
   <p class="st-help">مطلب را باز کنید، تغییر دهید و zip بگیرید؛ فقط فایل تغییرکرده در zip است و جایگزین فایل قبلی می‌شود. شناسهٔ آدرس عوض نمی‌شود. فایل‌های .mdx اینجا ویرایش نمی‌شوند.</p>
   <input class="st-in" data-act="ex-search" placeholder="جست‌وجو در عنوان‌ها…">
   <div class="st-cities" id="st-ex-list">${items.map((i) => `<div class="st-city st-ex-item" data-q="${esc(i.title + ' ' + i.slug)}"><div><b>${esc(i.title)}</b><small>${i.label}${i.draft ? ' · پیش‌نویس' : ''} · <span dir="ltr">${esc(i.slug)}</span></small></div>
     <div><button class="btn btn-ghost" data-act="edit-existing" data-t="${i.t}" data-v="${esc(i.slug)}" ${i.ext === 'mdx' ? 'disabled title="فایل mdx"' : ''}>باز کردن</button></div></div>`).join('') || '<p class="st-help">هنوز مطلبی نیست.</p>'}</div>
   <div id="st-ex-msg" class="st-msg"></div></details>
-<details class="st-card st-more"><summary>متن آماده دارم (با یا بدون front matter)</summary>
+${lockedType !== 'guide' && lockedType !== 'area-page' ? `<details class="st-card st-more"><summary>متن آماده دارم (با یا بدون front matter)</summary>
   <textarea class="st-in ltr-text" id="st-import" rows="8" placeholder="---\ntitle: ...\n---\nمتن..."></textarea>
   <div class="st-actions"><button class="btn btn-primary" data-act="import">وارد کن</button></div>
-  <div id="st-import-msg" class="st-msg"></div></details>`;
+  <div id="st-import-msg" class="st-msg"></div></details>` : ''}`;
 }
 
 function panelCities(): string {
   const areaSet = new Set(kit.areas.map((a: any) => a.slug));
   return `
-<div class="st-intro"><h2>شهرها و مناطق</h2><p>هر شهر یک فایل جدا دارد. ویرایش یا شهر جدید اضافه کنید و برای صفحه‌اش متن بلند بسازید.</p></div>
+<div class="st-intro"><h2>مناطق</h2><p>هر شهر دو بخش دارد: اطلاعات ساخت‌یافته (نام، نکات، پرسش‌ متداول) و متن بلند آزاد صفحه. «ویرایش» برای بخش اول، «متن بلند» برای بخش دوم است.</p></div>
 <div class="st-actions"><button class="btn btn-primary" data-act="new" data-v="region-entry">شهر جدید</button>
 <button class="btn btn-ghost" data-act="batch-area">متن بلند برای چند شهر (Agent)</button></div>
 <div class="st-cities">${kit.regions.map((r: any) => {
@@ -376,7 +400,7 @@ function revalidate() {
 function scheduleValidate() { clearTimeout(validateTimer); validateTimer = window.setTimeout(revalidate, 250); }
 
 // ───────── رندر ─────────
-const TABS: [Tab, string][] = [['agent', 'Agent'], ['copy', 'Copy-for-AI'], ['manual', 'دستی'], ['cities', 'شهرها'], ['pages', 'صفحه‌ها']];
+const TABS: [Tab, string][] = [['guide', 'راهنماها'], ['article', 'مقالات'], ['area', 'مناطق'], ['trades', 'تجربه‌ها'], ['services', 'خدمات'], ['pages', 'صفحه اصلی']];
 const PG_KEY = 'studio.pages';
 const pgBase = () => JSON.stringify(kit.pages?.home ?? {});
 function pgLoad() {
@@ -385,12 +409,19 @@ function pgLoad() {
 }
 function pgSave() { try { localStorage.setItem(PG_KEY, JSON.stringify(S.pages)); } catch { /* ignore */ } }
 function panelPages(): string { pgLoad(); return pagesPanel(S.pages, S.ui, JSON.stringify(S.pages) !== pgBase()); }
+function panel(): string {
+  if (S.tab === 'guide') return contentPanel('guide');
+  if (S.tab === 'article') return contentPanel('article');
+  if (S.tab === 'area') return S.areaWrite ? areaWritePanel() : panelCities();
+  if (S.tab === 'trades') return expPanel();
+  if (S.tab === 'services') return srvPanel();
+  return panelPages();
+}
 function render() {
-  const panel = { agent: panelAgent, copy: panelCopy, manual: panelManual, cities: panelCities, pages: panelPages }[S.tab]();
   app().innerHTML = `
 <nav class="st-tabs" role="tablist">${TABS.map(([t, l]) => `<button role="tab" class="${S.tab === t ? 'on' : ''}" data-act="tab" data-v="${t}">${l}</button>`).join('')}</nav>
 <datalist id="dl-categories">${(kit.lists.categories ?? []).map((c: string) => `<option value="${esc(c)}">`).join('')}</datalist>
-<section class="st-panel">${panel}</section>
+<section class="st-panel">${panel()}</section>
 <section class="st-bench" id="st-bench">${benchHtml()}</section>`;
   if (S.pkg) revalidate();
 }
@@ -404,6 +435,22 @@ function readField(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElemen
 }
 function onInput(e: Event) {
   const el = e.target as HTMLInputElement;
+  if (el.dataset.exp !== undefined) {
+    const i = Number(el.dataset.exp);
+    const k = el.dataset.k!;
+    const kind = el.dataset.kind;
+    const raw = (el as any).type === 'checkbox' ? (el.checked ? '1' : '') : el.value;
+    expSetField(i, k, raw, kind);
+    return;
+  }
+  if (el.dataset.srv !== undefined) {
+    const i = Number(el.dataset.srv);
+    const k = el.dataset.k!;
+    const kind = el.dataset.kind;
+    const raw = (el as any).type === 'checkbox' ? (el.checked ? '1' : '') : el.value;
+    srvSetField(i, k, raw, kind);
+    return;
+  }
   const s = el.dataset.s;
   if (el.dataset.act === 'ex-search') { const q = el.value.trim().toLowerCase(); document.querySelectorAll<HTMLElement>('.st-ex-item').forEach((n) => (n.hidden = !!q && !(n.dataset.q ?? '').toLowerCase().includes(q))); return; }
   if (el.dataset.act === 'reply') { S.reply = el.value; save(); return; }
@@ -432,6 +479,24 @@ function onInput(e: Event) {
   save(); scheduleValidate();
 }
 
+function tryLoadReply(): boolean {
+  const msg = $('#st-reply-msg');
+  try {
+    if (!S.reply.trim()) throw new Error('پاسخ را بچسبانید.');
+    const inp = S.inputs[S.ctype];
+    S.pkg = pkgFromReply(S.ctype, S.reply, inp);
+    S.pkg.isNew = S.ctype === 'article' || S.ctype === 'guide' ? true : !kit.areas.some((a: any) => a.slug === S.pkg!.slug);
+    coverObj = '';
+    if (msg) { msg.textContent = ''; }
+    save(); renderBench();
+    $('#st-bench')?.scrollIntoView({ behavior: 'smooth' });
+    return true;
+  } catch (err) {
+    if (msg) { msg.textContent = (err as Error).message; msg.className = 'st-msg err'; }
+    return false;
+  }
+}
+
 async function loadPkgFromText(text: string, type: PkgType): Promise<Pkg> {
   const { fm, body } = parseMd(text);
   const p = newPkg(type);
@@ -456,9 +521,11 @@ async function onClick(e: Event) {
     case 'pg-download': pgLoad(); download(new Blob([pagesJson(S.pages)], { type: 'application/json' }), 'home.json'); toast('home.json دانلود شد؛ جایگزین src/data/home.json کنید.'); break;
     case 'pg-copy': pgLoad(); await copy(pagesJson(S.pages), 'JSON کپی شد'); break;
     case 'pg-reset': if (confirm('همهٔ تغییرات این صفحه پاک و به نسخهٔ سایت برگردانده شود؟')) { try { localStorage.removeItem(PG_KEY); } catch { /* ignore */ } S.pages = null; render(); } break;
-    case 'tab': S.tab = v as Tab; save(); render(); window.scrollTo({ top: 0 }); break;
+    case 'tab': S.tab = v as Tab; if (v !== 'area') S.areaWrite = null; save(); render(); window.scrollTo({ top: 0 }); break;
+    case 'method': S.method = v as Method; save(); render(); break;
     case 'ctype': S.ctype = v as any; save(); render(); break;
-    case 'to-copy': S.tab = 'copy'; save(); render(); break;
+    case 'area-back': S.areaWrite = null; save(); render(); break;
+    case 'to-copy': S.method = 'copy'; save(); render(); break;
     case 'batch': {
       const cb = el as HTMLInputElement;
       S.batch = cb.checked ? [...new Set([...S.batch, cb.value])] : S.batch.filter((x) => x !== cb.value);
@@ -496,18 +563,21 @@ async function onClick(e: Event) {
     }
     case 'copy-prompt': await copy(S.prompt, 'پرامپت کپی شد؛ حالا در چت AI بچسبانید'); break;
     case 'copy-text': { const ps = buildStaged(S.ctype, S.inputs[S.ctype], S.stage.r1, S.stage.r2); await copy(ps[Number(el.dataset.i)], 'کپی شد'); break; }
-    case 'load-reply': {
-      const msg = $('#st-reply-msg')!;
+    case 'load-reply': tryLoadReply(); break;
+    case 'ai-generate': {
+      if (!S.prompt || S.prompt === 'staged') { toast('اول «ساخت پرامپت» را بزنید.', 'err'); break; }
+      const btn = el as HTMLButtonElement;
+      const prevLabel = btn.textContent;
+      btn.disabled = true; btn.textContent = 'در حال تولید…';
       try {
-        if (!S.reply.trim()) throw new Error('پاسخ را بچسبانید.');
-        const inp = S.inputs[S.ctype];
-        S.pkg = pkgFromReply(S.ctype, S.reply, inp);
-        S.pkg.isNew = S.ctype === 'article' || S.ctype === 'guide' ? true : !kit.areas.some((a: any) => a.slug === S.pkg!.slug);
-        coverObj = '';
-        msg.textContent = ''; save(); renderBench();
-        toast('بسته ساخته شد؛ پایین صفحه بررسی و ویرایش کنید.');
-        $('#st-bench')?.scrollIntoView({ behavior: 'smooth' });
-      } catch (err) { msg.textContent = (err as Error).message; msg.className = 'st-msg err'; }
+        S.reply = await callAnthropic(S.prompt);
+        save();
+        const ta = document.querySelector('[data-act="reply"]') as HTMLTextAreaElement | null;
+        if (ta) ta.value = S.reply;
+        if (!tryLoadReply()) break;
+        toast('با API ساخته شد؛ پایین صفحه بررسی کنید.');
+      } catch (err) { toast((err as Error).message, 'err'); }
+      finally { btn.disabled = false; btn.textContent = prevLabel; }
       break;
     }
     case 'new': {
@@ -541,8 +611,8 @@ async function onClick(e: Event) {
       save(); renderBench(); $('#st-bench')?.scrollIntoView({ behavior: 'smooth' });
       break;
     }
-    case 'area-for': S.ctype = 'area-page'; S.inputs['area-page'].region = v; S.tab = 'copy'; save(); render(); toast('منطقه انتخاب شد؛ حقایق محلی را بنویسید.'); break;
-    case 'batch-area': S.ctype = 'area-page'; S.tab = 'agent'; save(); render(); break;
+    case 'area-for': S.ctype = 'area-page'; S.inputs['area-page'].region = v; S.tab = 'area'; S.areaWrite = v; S.method = 'agent'; save(); render(); toast('منطقه انتخاب شد؛ حقایق محلی را بنویسید.'); break;
+    case 'batch-area': S.ctype = 'area-page'; S.tab = 'area'; S.areaWrite = '__batch__'; S.method = 'agent'; save(); render(); break;
     case 'suggest-slug': {
       const p = S.pkg!; p.slug = suggestSlug(p.type, { service: p.fm.service, region: p.fm.region, trade: p.fm.trade });
       renderBench(); break;
@@ -594,8 +664,42 @@ async function onClick(e: Event) {
     case 'repair': await copy(repairPrompt(S.pkg!, issues), 'پرامپت اصلاح کپی شد؛ در همان چت بچسبانید و پاسخ را دوباره وارد کنید'); break;
     case 'discard': if (confirm('این پیش‌نویس حذف شود؟')) { S.pkg = null; coverObj = ''; save(); renderBench(); } break;
     case 'close-preview': $('#st-preview')!.hidden = true; document.body.classList.remove('st-lock'); break;
+    case 'close-settings': $('#st-settings')!.hidden = true; break;
+    case 'save-settings': saveSettings(); break;
     case 'pv-mobile': $('#st-pv-frame')!.className = 'st-frame mobile'; break;
     case 'pv-desktop': $('#st-pv-frame')!.className = 'st-frame'; break;
+    case 'exp-open': { const err = await expOpenFolder(); render(); if (err) toast(err, 'err'); break; }
+    case 'exp-paste': { const box = $('#exp-paste-box'); if (box) box.hidden = !box.hidden; break; }
+    case 'exp-paste-apply': {
+      const ta = $('#exp-paste-ta') as HTMLTextAreaElement | null;
+      const err = expApplyRaw(ta?.value ?? '');
+      if (err) { const m = $('#exp-msg'); if (m) { m.textContent = err; m.className = 'st-msg err'; } }
+      else render();
+      break;
+    }
+    case 'exp-mode': expSetMode(v as 'simple' | 'advanced'); render(); break;
+    case 'exp-add': expAdd(v as 'checklist' | 'quiz'); render(); break;
+    case 'exp-del': if (confirm('این ابزار حذف شود؟')) { expDelete(Number(el.dataset.i)); render(); } break;
+    case 'exp-toggle': expToggle(Number(el.dataset.i)); render(); break;
+    case 'exp-save': { const err = await expSaveFolder(); toast(err ?? 'experiences.json ذخیره شد.', err ? 'err' : 'ok'); break; }
+    case 'exp-download': download(expDownloadBlob(), 'experiences.json'); toast('دانلود شد؛ جایگزین src/data/experiences.json کنید.'); break;
+    case 'exp-copy-prompt': { const req = ($('#exp-ai-req') as HTMLInputElement | null)?.value ?? ''; await copy(expPrompt(req), 'پرامپت کپی شد'); break; }
+    case 'exp-apply-raw': {
+      const ta = $('#exp-raw') as HTMLTextAreaElement | null;
+      const err = expApplyRaw(ta?.value ?? '');
+      const m = $('#exp-msg');
+      if (err && m) { m.textContent = err; m.className = 'st-msg err'; }
+      else { toast('اعمال شد.'); render(); }
+      break;
+    }
+    case 'srv-open': { const err = await srvOpenFolder(); render(); if (err) toast(err, 'err'); break; }
+    case 'srv-add': srvAdd(); render(); break;
+    case 'srv-del': if (confirm('این خدمت حذف شود؟')) { srvDelete(Number(el.dataset.i)); render(); } break;
+    case 'srv-toggle': srvToggleOpen(Number(el.dataset.i)); render(); break;
+    case 'srv-toggle-enabled': srvToggleEnabled(v); render(); break;
+    case 'srv-save': { const err = await srvSaveFolder(); toast(err ?? 'services.json و site.config.json ذخیره شد.', err ? 'err' : 'ok'); break; }
+    case 'srv-download': download(srvServicesBlob(), 'services.json'); toast('دانلود شد؛ جایگزین src/data/services.json کنید.'); break;
+    case 'srv-download-config': download(srvConfigBlob(), 'site.config.json'); toast('دانلود شد؛ جایگزین src/config/site.config.json کنید.'); break;
   }
 }
 
@@ -701,6 +805,46 @@ function mdInsert(id: string) {
   S.pkg.body = ta.value; save(); scheduleValidate();
 }
 
+// ───────── تنظیمات (کلید API، فعلاً فقط ذخیره محلی) ─────────
+const SET_KEY = 'studio.settings';
+function loadSettings(): { apiKey?: string; model?: string } {
+  try { return JSON.parse(localStorage.getItem(SET_KEY) ?? '{}'); } catch { return {}; }
+}
+function openSettings() {
+  const s = loadSettings();
+  const inp = $('#st-set-apikey') as HTMLInputElement | null;
+  const minp = $('#st-set-model') as HTMLInputElement | null;
+  if (inp) inp.value = s.apiKey ?? '';
+  if (minp) minp.value = s.model ?? '';
+  $('#st-settings')!.hidden = false;
+}
+function saveSettings() {
+  const inp = $('#st-set-apikey') as HTMLInputElement | null;
+  const minp = $('#st-set-model') as HTMLInputElement | null;
+  try {
+    localStorage.setItem(SET_KEY, JSON.stringify({ apiKey: inp?.value.trim() ?? '', model: minp?.value.trim() ?? '' }));
+    toast('تنظیمات ذخیره شد');
+  } catch { toast('ذخیره نشد (حالت خصوصی مرورگر؟)', 'err'); }
+  $('#st-settings')!.hidden = true;
+  render();
+}
+// فراخوانی مستقیم Anthropic API از مرورگر (فقط وقتی خودتان Studio را لوکال اجرا می‌کنید و کلید را در تنظیمات گذاشته‌اید).
+async function callAnthropic(promptText: string): Promise<string> {
+  const { apiKey, model } = loadSettings();
+  if (!apiKey) throw new Error('اول کلید API را در تنظیمات (⚙) وارد کنید.');
+  if (!model) throw new Error('اول شناسهٔ مدل را در تنظیمات (⚙) وارد کنید (مثلاً یکی از مدل‌های Claude).');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model, max_tokens: 8000, messages: [{ role: 'user', content: promptText }] })
+  });
+  if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(`خطای API (${res.status}): ${t.slice(0, 300)}`); }
+  const j = await res.json();
+  const text = (j.content ?? []).map((b: any) => b.text ?? '').join('');
+  if (!text) throw new Error('پاسخی از API دریافت نشد.');
+  return text;
+}
+
 // ───────── پیش‌نمایش و خروجی ─────────
 function openPreview() {
   const pkg = S.pkg!;
@@ -765,12 +909,16 @@ async function main() {
   const root = app();
   try { await loadKit(); } catch (err) { root.innerHTML = `<div class="st-card st-err">${esc((err as Error).message)}</div>`; return; }
   await restore();
+  expRestore();
+  srvRestore();
   $('#st-site')!.textContent = kit.site.name ?? '';
   root.addEventListener('click', onClick);
   root.addEventListener('input', onInput);
   root.addEventListener('change', onChange);
   root.addEventListener('toggle', (e) => { const d = e.target as HTMLElement; if (d.dataset?.ui) S.ui[d.dataset.ui] = (d as HTMLDetailsElement).open; }, true);
   $('#st-preview')!.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('[data-act]')) onClick(e); });
+  $('#st-settings')!.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('[data-act]')) onClick(e); });
+  $('#st-settings-btn')?.addEventListener('click', openSettings);
   render();
 }
 main();

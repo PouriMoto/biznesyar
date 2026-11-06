@@ -9,34 +9,102 @@ import { site } from '../../config';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <style is:inline>html:not([data-ok]){visibility:hidden}</style>
-    <script is:inline>
-      (function(){try{var j=JSON.parse(localStorage.getItem("studio.auth")||"null");if(j&&Date.now()-j.t<6048e5){document.documentElement.setAttribute("data-ok","1");return}}catch(e){}location.replace("/")})();
-    </script>
     <title>Studio | {site.brand.name_fa}</title>
     <link rel="icon" href={site.assets.favicon} type="image/svg+xml" />
     <link rel="preload" href="/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body class="st">
-    <header class="st-top">
-      <div class="st-brand"><b>Studio</b><small id="st-site"></small></div>
-      <span><a class="st-link" href="/">سایت ↗</a> · <button class="st-out" id="st-out" type="button">خروج</button></span>
-    </header>
-    <main class="st-main" id="app"><p class="st-loading">در حال بارگذاری…</p></main>
-    <div class="st-toast" id="st-toast" role="status" aria-live="polite"></div>
-    <div class="st-modal" id="st-preview" hidden>
-      <div class="st-modal-bar">
-        <button class="btn btn-ghost" data-act="close-preview">بستن</button>
-        <div class="st-seg"><button data-act="pv-desktop">دسکتاپ</button><button data-act="pv-mobile">موبایل</button></div>
+    <div class="st-login" id="st-login">
+      <form class="st-login-card" id="st-login-form">
+        <h1>ورود به Studio</h1>
+        <label class="st-field">
+          <span class="st-label">رمز عبور</span>
+          <input class="st-in" type="password" id="st-pw" autocomplete="current-password" required />
+        </label>
+        <button class="btn btn-primary" type="submit">ورود</button>
+        <p class="st-msg err" id="st-login-err" hidden>رمز اشتباه است.</p>
+      </form>
+    </div>
+    <div id="st-shell" hidden>
+      <header class="st-top">
+        <div class="st-brand"><b>Studio</b><small id="st-site"></small></div>
+        <span><button class="st-link st-gear" id="st-settings-btn" type="button" title="تنظیمات Studio" aria-label="تنظیمات">⚙︎</button> · <a class="st-link" href="/">سایت ↗</a> · <button class="st-out" id="st-out" type="button">خروج</button></span>
+      </header>
+      <main class="st-main" id="app"><p class="st-loading">در حال بارگذاری…</p></main>
+      <div class="st-toast" id="st-toast" role="status" aria-live="polite"></div>
+      <div class="st-modal" id="st-preview" hidden>
+        <div class="st-modal-bar">
+          <button class="btn btn-ghost" data-act="close-preview">بستن</button>
+          <div class="st-seg"><button data-act="pv-desktop">دسکتاپ</button><button data-act="pv-mobile">موبایل</button></div>
+        </div>
+        <div class="st-serp-wrap"><small>نمایش در نتایج گوگل (تقریبی)</small><div id="st-pv-serp"></div></div>
+        <div class="st-frame-wrap"><iframe id="st-pv-frame" class="st-frame" sandbox="allow-same-origin" title="پیش‌نمایش"></iframe></div>
       </div>
-      <div class="st-serp-wrap"><small>نمایش در نتایج گوگل (تقریبی)</small><div id="st-pv-serp"></div></div>
-      <div class="st-frame-wrap"><iframe id="st-pv-frame" class="st-frame" sandbox="allow-same-origin" title="پیش‌نمایش"></iframe></div>
+      <div class="st-modal st-modal-simple" id="st-settings" hidden>
+        <div class="st-modal-bar">
+          <button class="btn btn-ghost" data-act="close-settings">بستن</button>
+          <b>تنظیمات Studio</b>
+        </div>
+        <div class="st-modal-body">
+          <div class="st-card">
+            <div class="st-field">
+              <label class="st-label">کلید API (اختیاری)</label>
+              <input class="st-in ltr" type="password" id="st-set-apikey" autocomplete="off" placeholder="کلید API کلود (برای تولید خودکار مقاله/راهنما در تب Copy-for-AI)">
+              <small class="st-help">فقط در همین مرورگر ذخیره می‌شود. فقط وقتی Studio را از سیستم خودتان اجرا می‌کنید استفاده‌اش امن است — از همین مرورگر مستقیم به Anthropic فرستاده می‌شود.</small>
+            </div>
+            <div class="st-field">
+              <label class="st-label">شناسهٔ مدل</label>
+              <input class="st-in ltr" type="text" id="st-set-model" autocomplete="off" placeholder="مثلاً claude-sonnet-4-5-20250929">
+              <small class="st-help">هر شناسهٔ مدل معتبر کلود که خودتان به آن دسترسی دارید.</small>
+            </div>
+            <div class="st-field">
+              <label class="st-label">توکن گیت‌هاب</label>
+              <input class="st-in ltr" type="password" disabled placeholder="فاز بعد — ارسال خودکار محتوا به گیت‌هاب">
+              <small class="st-help">هنوز فعال نیست؛ در فاز بعدی اضافه می‌شود.</small>
+            </div>
+            <button class="btn btn-primary" data-act="save-settings">ذخیره تنظیمات</button>
+          </div>
+        </div>
+      </div>
     </div>
     <script>
-      import { isAuthed, logout } from '../../scripts/studio/gate';
-      if (isAuthed()) import('../../scripts/studio/app.ts');
-      else location.replace('/');
-      document.getElementById('st-out')?.addEventListener('click', () => { logout(); location.replace('/'); });
+      import { isAuthed, tryLogin, logout } from '../../scripts/studio/gate';
+
+      const loginBox = document.getElementById('st-login')!;
+      const shell = document.getElementById('st-shell')!;
+      const form = document.getElementById('st-login-form') as HTMLFormElement;
+      const pwInput = document.getElementById('st-pw') as HTMLInputElement;
+      const err = document.getElementById('st-login-err')!;
+
+      async function enter() {
+        loginBox.hidden = true;
+        shell.hidden = false;
+        await import('../../scripts/studio/app.ts');
+      }
+
+      if (isAuthed()) {
+        enter();
+      } else {
+        pwInput.focus();
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        err.hidden = true;
+        const ok = await tryLogin(pwInput.value);
+        if (ok) {
+          await enter();
+        } else {
+          err.hidden = false;
+          pwInput.value = '';
+          pwInput.focus();
+        }
+      });
+
+      document.getElementById('st-out')?.addEventListener('click', () => {
+        logout();
+        location.reload();
+      });
     </script>
   </body>
 </html>

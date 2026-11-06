@@ -117,3 +117,15 @@ html, body.st { max-width: 100%; overflow-x: hidden; }
   .st-actions .btn { flex: 0 1 auto; }
 }
 @media (max-width: 599px) { .st-seg { display: flex; flex-wrap: wrap; overflow: visible; } .st-seg button { flex: 1 1 auto; } }
+
+/* صفحهٔ ورود Studio */
+.st-login { min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; }
+.st-login-card { width: min(100%, 22rem); background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; display: grid; gap: 1rem; box-shadow: 0 10px 28px rgba(15, 31, 46, .08); }
+.st-login-card h1 { font-size: 1.2rem; margin: 0; text-align: center; }
+.st-login-card .btn { width: 100%; justify-content: center; }
+.st-login-card .st-msg { text-align: center; margin: 0; }
+
+/* تنظیمات Studio */
+.st-gear { font-size: 1.05rem; }
+.st-modal-simple { grid-template-rows: auto 1fr; }
+.st-modal-body { padding: 1rem; overflow: auto; width: min(100%, 32rem); margin: 0 auto; }

@@ -1,7 +1,7 @@
 // قفل «پنهان‌سازی» Studio — فقط ورودی را مخفی می‌کند، قفل امنیتی واقعی نیست
 // (برای قفل واقعی روی VPS: Caddy basic auth برای /studio/*). رمز در کد نیست؛ فقط اثر انگشت آن.
 const SALT = 'bizyaar-studio-v1';
-const HASH = '0507bddc0a12f8253875acb47290142372c13d8d3a737a66e13d1a615714fb2c';
+const HASH = '7bbc271ad0798c758965ec0a21d0de5efde4135ed868b05c992df25b063aed73';
 const KEY = 'studio.auth';
 const TTL = 7 * 24 * 3600 * 1000;
 
