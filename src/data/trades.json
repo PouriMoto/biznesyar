@@ -1,7 +1,7 @@
 [
   {
-    "slug": "beauty-salon-women",
-    "name": "آرایشگاه زنانه",
+    "slug": "beauty-salon",
+    "name": "آرایشگری زنانه و سالن زیبایی",
     "group": "خدمات شخصی",
     "aliases": [],
     "notes": [],
@@ -9,11 +9,75 @@
   },
   {
     "slug": "barbershop",
-    "name": "آرایشگاه مردانه",
+    "name": "پیرایشگری مردانه",
     "group": "خدمات شخصی",
     "aliases": [],
     "notes": [],
     "verified": true
+  },
+  {
+    "slug": "restaurant",
+    "name": "رستوران، کافه و فست‌فود",
+    "group": "غذا و پذیرایی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "education-institute",
+    "name": "آموزشگاه فنی و حرفه‌ای",
+    "group": "آموزش",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "preschool",
+    "name": "مهدکودک و پیش‌دبستانی",
+    "group": "آموزش",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "sports-club",
+    "name": "باشگاه ورزشی",
+    "group": "ورزش",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "travel-agency",
+    "name": "دفتر خدمات مسافرتی",
+    "group": "گردشگری",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "car-service",
+    "name": "تعمیرگاه و خدمات خودرو",
+    "group": "خدمات فنی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "supermarket",
+    "name": "سوپرمارکت و خواروبار",
+    "group": "غذا و پذیرایی",
+    "aliases": [],
+    "notes": [],
+    "verified": false
+  },
+  {
+    "slug": "it-services",
+    "name": "خدمات فناوری اطلاعات",
+    "group": "فناوری اطلاعات",
+    "aliases": [],
+    "notes": [],
+    "verified": false
   },
   {
     "slug": "cafe",
@@ -22,14 +86,6 @@
     "aliases": [],
     "notes": [],
     "verified": true
-  },
-  {
-    "slug": "restaurant",
-    "name": "رستوران",
-    "group": "غذا و پذیرایی",
-    "aliases": [],
-    "notes": [],
-    "verified": false
   },
   {
     "slug": "grocery",

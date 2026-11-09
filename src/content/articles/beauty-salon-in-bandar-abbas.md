@@ -8,7 +8,6 @@ tags:
   - پروانه کسب هرمزگان
   - مدارک آرایشگری
 service: business-license
-trade: beauty-salon-women
 region: bandar-abbas
 publishedAt: 2026-10-26
 updatedAt: 2026-10-30
@@ -17,7 +16,7 @@ leadForm: true
 magnet: license-docs
 generatedBy: agent
 cover:
-  src: ../../assets/guides/beauty-salon-license-bandar-abbas/cover.webp
+  src: ../../assets/articles/beauty-salon-license-bandar-abbas/cover.webp
   alt: "آرایشگاه زنانه در بندرعباس"
   caption: "راهنمای اختصاصی پروانه کسب آرایشگری زنانه در بندرعباس"
 faq:

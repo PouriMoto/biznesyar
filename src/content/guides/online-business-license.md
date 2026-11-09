@@ -13,7 +13,7 @@ leadForm: true
 magnet: online-license-checklist
 generatedBy: agent
 cover:
-  src: ../../assets/guides/online-business-license/cover.webp
+  src: "../../assets/articles/business-license-bandar-abbas/cover.webp"
   alt: تفاوت جواز کسب اینترنتی و جواز کسب صنفی
   caption: راهنمای انتخاب بین جواز کسب اینترنتی و صنفی
 faq:

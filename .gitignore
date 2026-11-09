@@ -11,9 +11,7 @@ dist
 !*.local.example.json
 
 # خروجی ساخته‌شده توسط scripts/build-kit.mjs
-public/studio/kit.json
-public/studio/preview.css
-public/studio/content.json
+
 
 # بک‌اند (فاز ۱): فقط روی سرور شما؛ در مخزن عمومی نمی‌رود
 server/
